@@ -1,0 +1,232 @@
+.awsServiceNode_card {
+  overflow: visible;
+  width: 190px;
+  height: 254px;
+}
+
+.awsServiceNode_content {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 300ms;
+  box-shadow: 0px 0px 10px 1px #000000ee;
+  border-radius: 5px;
+  position: relative;
+}
+
+.awsServiceNode_front, .awsServiceNode_back {
+  background-color: #151515;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 5px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.awsServiceNode_back {
+}
+
+.awsServiceNode_back::before {
+  position: absolute;
+  content: ' ';
+  display: block;
+  width: 160px;
+  height: 160%;
+  background: linear-gradient(90deg, transparent, #ff9966, #ff9966, #ff9966, #ff9966, transparent);
+  animation: awsServiceNode_rotation_481 5000ms infinite linear;
+}
+
+.awsServiceNode_back_content {
+  position: relative;
+  width: 99%;
+  height: 99%;
+  background-color: #151515;
+  border-radius: 5px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  z-index: 1;
+}
+
+.awsServiceNode_card:hover .awsServiceNode_content {
+  transform: rotateY(180deg);
+}
+
+@keyframes awsServiceNode_rotation_481 {
+  0% {
+    transform: rotateZ(0deg);
+  }
+
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+.awsServiceNode_front {
+  transform: rotateY(180deg);
+  color: white;
+}
+
+.awsServiceNode_front_iconWrapper {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.awsServiceNode_front_serviceIcon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+}
+
+.awsServiceNode_front_fallbackIconContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 6px;
+  border: 1px dashed rgba(255,255,255,0.3);
+}
+
+.awsServiceNode_front_fallbackIconText {
+  font-size: 18px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.awsServiceNode_front_label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.3;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin-bottom: 8px;
+}
+
+.awsServiceNode_front_domainBadge {
+  font-size: 10px;
+  font-weight: 500;
+  color: #151515;
+  padding: 3px 8px;
+  background: #ff9966;
+  border-radius: 12px;
+  text-transform: capitalize;
+  line-height: 1;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: rgba(255, 153, 102, 0.5) !important;
+  border: 1px solid rgba(255, 153, 102, 0.8) !important;
+  border-radius: 50%;
+  z-index: 10;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.awsServiceNode_card:hover .handle {
+  opacity: 1;
+  background: #ff9966 !important;
+}
+
+.handle.react-flow__handle-top { top: -5px; }
+.handle.react-flow__handle-bottom { bottom: -5px; }
+.handle.react-flow__handle-left { left: -5px; }
+.handle.react-flow__handle-right { right: -5px; }
+
+.selected .awsServiceNode_content {
+  box-shadow: 0 0 0 2.5px #ff9966,
+              0 0 20px rgba(255, 153, 0, 0.6);
+}
+
+.awsServiceNode_front_img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.awsServiceNode_circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background-color: #ffbb66;
+  position: absolute;
+  filter: blur(15px);
+  animation: awsServiceNode_floating 2600ms infinite linear;
+}
+
+#awsServiceNode_bottom_circle {
+  background-color: #ff8866;
+  left: 50px;
+  top: 0px;
+  width: 150px;
+  height: 150px;
+  animation-delay: -800ms;
+}
+
+#awsServiceNode_right_circle {
+  background-color: #ff2233;
+  left: 160px;
+  top: -80px;
+  width: 30px;
+  height: 30px;
+  animation-delay: -1800ms;
+}
+
+@keyframes awsServiceNode_floating {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.awsServiceNode_back_customSvg {
+  width: 50px;
+  height: 50px;
+  fill: #ffffff;
+}
+
+.awsServiceNode_back_text {
+  font-size: 14px;
+  color: white;
+  margin-top: 10px;
+} 
