@@ -1,0 +1,521 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": -53.40346667418118,
+        "y": 403.5144501268235
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Handles incoming API requests",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/API-Gateway.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": 249.84734600964083,
+        "y": 401.7678487705104
+      },
+      "data": {
+        "label": "Application Load Balancer",
+        "service": "Elastic Load Balancing",
+        "description": "Distributes incoming traffic across targets",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/ElastiCache.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": -354.5075585050384,
+        "y": 396.91510744793135
+      },
+      "data": {
+        "label": "Lambda - Auth",
+        "service": "AWS Lambda",
+        "description": "Handles user authentication",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": -47.614025471098294,
+        "y": 398.6993799482008
+      },
+      "data": {
+        "label": "Lambda - Transactions",
+        "service": "AWS Lambda",
+        "description": "Processes transaction requests",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": -352.351606337251,
+        "y": 404.2824768314574
+      },
+      "data": {
+        "label": "DynamoDB",
+        "service": "Amazon DynamoDB",
+        "description": "NoSQL database for user profiles and transactions",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": -54.18299826547391,
+        "y": 395.2091240699714
+      },
+      "data": {
+        "label": "S3",
+        "service": "Amazon S3",
+        "description": "Stores audit logs and static assets",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": 245.54331315842194,
+        "y": 402.88202495062336
+      },
+      "data": {
+        "label": "KMS",
+        "service": "AWS Key Management Service",
+        "description": "Manages encryption keys for sensitive data",
+        "estCost": "$1/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node8",
+      "type": "awsService",
+      "position": {
+        "x": 254.77727442228925,
+        "y": 403.85430671799384
+      },
+      "data": {
+        "label": "CloudWatch Logs",
+        "service": "Amazon CloudWatch",
+        "description": "Collects and monitors logs",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node9",
+      "type": "awsService",
+      "position": {
+        "x": 545.7657337723789,
+        "y": 399.0030450713657
+      },
+      "data": {
+        "label": "Auto Scaling Group",
+        "service": "AWS Auto Scaling",
+        "description": "Scales resources based on demand",
+        "estCost": "$0/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node10",
+      "type": "awsService",
+      "position": {
+        "x": -346.86523837095984,
+        "y": 571.8091512847886
+      },
+      "data": {
+        "label": "Amazon ECS",
+        "service": "Amazon ECS",
+        "description": "Manages containerized applications",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node11",
+      "type": "awsService",
+      "position": {
+        "x": -54.007586953078814,
+        "y": 570.6137779006118
+      },
+      "data": {
+        "label": "CloudWatch Alarms",
+        "service": "Amazon CloudWatch",
+        "description": "Triggers alerts and scaling policies",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node12",
+      "type": "awsService",
+      "position": {
+        "x": 549.5447193204309,
+        "y": 403.647910536033
+      },
+      "data": {
+        "label": "DynamoDB Accelerator (DAX)",
+        "service": "Amazon DAX",
+        "description": "In-memory cache for DynamoDB to improve read performance",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node13",
+      "type": "awsService",
+      "position": {
+        "x": 247.8728590937944,
+        "y": 568.2892879884006
+      },
+      "data": {
+        "label": "ECS Auto Scaling",
+        "service": "AWS Auto Scaling",
+        "description": "Scales ECS tasks based on metrics",
+        "estCost": "$0/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Routes incoming requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node2",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Distributes authentication requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node2",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Distributes transaction requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node2",
+      "target": "node10",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Distributes containerized tasks",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node3",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Retrieves user profiles",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node4",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Reads/writes transaction data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node4",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Stores audit logs",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge8",
+      "source": "node5",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Encrypts sensitive data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge9",
+      "source": "node5",
+      "target": "node12",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Caches frequent reads",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge10",
+      "source": "node3",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Sends authentication logs",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge11",
+      "source": "node4",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Sends transaction metrics",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge12",
+      "source": "node9",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Scales Lambda - Auth instances",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge13",
+      "source": "node9",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Scales Lambda - Transactions instances",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge14",
+      "source": "node13",
+      "target": "node10",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Scales ECS tasks",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge15",
+      "source": "node11",
+      "target": "node9",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers Lambda scaling policies",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge16",
+      "source": "node11",
+      "target": "node13",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers ECS scaling policies",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Design a well architected backend using aws serverless for banking systems.",
+    "rationale": "Generated using Cohere Command A (March 2025) - 7 services with 1 icons resolved",
+    "timestamp": "2025-06-03T20:03:57.418Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-06-03T21:42:08.724Z",
+    "lastEditedBy": "Claudio Chat",
+    "title": "Scalable Serverless Architecture with Caching",
+    "description": "Enhanced architecture for improved scalability and performance",
+    "estimatedCost": "$200/month",
+    "changes": "Added DynamoDB Accelerator (DAX) for caching frequent reads, introduced separate ECS Auto Scaling for better container management, and adjusted connections for improved scalability.",
+    "lastModified": "2025-06-03T21:42:08.723Z",
+    "modificationHistory": [
+      {
+        "timestamp": "2025-06-03T21:38:06.789Z",
+        "request": "What is the best way to scale my web app?",
+        "changes": "Added Application Load Balancer for traffic distribution, enabled auto-scaling for DynamoDB, and introduced AWS Auto Scaling for Lambda functions. Improved fault tolerance by adding more robust monitoring and logging."
+      },
+      {
+        "timestamp": "2025-06-03T21:41:28.379Z",
+        "request": "What is the best way to scale my web app?",
+        "changes": "Added Amazon ECS for containerized workload scaling, integrated CloudWatch Alarms for dynamic scaling policies, and ensured Auto Scaling Group manages both Lambda functions and ECS tasks."
+      },
+      {
+        "timestamp": "2025-06-03T21:42:08.723Z",
+        "request": "how can i scale my architecture",
+        "changes": "Added DynamoDB Accelerator (DAX) for caching frequent reads, introduced separate ECS Auto Scaling for better container management, and adjusted connections for improved scalability."
+      }
+    ]
+  }
+}

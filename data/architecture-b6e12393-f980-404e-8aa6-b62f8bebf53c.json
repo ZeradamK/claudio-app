@@ -1,0 +1,832 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": -47.41796815497184,
+        "y": 395.78698102559014
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Exposes RESTful APIs for frontend and mobile apps",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Networking",
+        "details": {
+          "summary": "Amazon API Gateway is a fully managed service that makes it easy for developers to create, publish, maintain, monitor, and secure APIs at any scale. API Gateway handles all the tasks involved in accepting and processing up to hundreds of thousands of concurrent API calls, including traffic management, CORS support, authorization and access control, throttling, monitoring, and API version management.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$0.00/mo",
+              "medium": "$10/mo",
+              "high": "$50/mo"
+            },
+            "pricingNotes": "API Gateway pricing is based on the number of API calls received and the amount of data transferred out. The first one million API calls per month are free, and data transfer costs vary by region."
+          },
+          "resilience": {
+            "scaling": "API Gateway automatically scales to handle thousands to hundreds of thousands of concurrent API calls. It also supports throttling to prevent misuse and ensure fair usage.",
+            "failover": "API Gateway is designed for high availability and reliability, with built-in fault tolerance and automatic failover across multiple Availability Zones."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const api = new apigateway.RestApi(this, 'MyApi', {\n  endpointTypes: [apigateway.EndpointType.REGIONAL],\n  defaultCorsPreflightOptions: {\n    allowOrigins: apigateway.Cors.ALL_ORIGINS,\n  },\n});\n\nconst integration = new apigateway.Integration(\n  'MyIntegration',\n  apigateway.IntegrationType.HTTP,\n  {\n    uri: 'http://example.com',\n  },\n  {}\n);\n\nconst resource = api.root.addResource('resource');\nresource.addMethod('GET', integration);"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\nclient = boto3.client('apigateway')\n\nresponse = client.create_rest_api(\n    name='MyApi',\n    description='My API Gateway',\n    endpointConfiguration={'types': ['REGIONAL']}\n)\n\nprint(response['id'])"
+          },
+          "terraform": {
+            "code": "resource \"aws_api_gateway_rest_api\" \"example\" {\n  name        = \"MyApi\"\n  description = \"My API Gateway\"\n\n  endpoint_configuration {\n    types = [\"REGIONAL\"]\n  }\n}\n\nresource \"aws_api_gateway_resource\" \"example\" {\n  rest_api_id = aws_api_gateway_rest_api.example.id\n  parent_id   = aws_api_gateway_rest_api.example.root_resource_id\n  path_part   = \"resource\"\n}\n\nresource \"aws_api_gateway_method\" \"example\" {\n  rest_api_id   = aws_api_gateway_rest_api.example.id\n  resource_id   = aws_api_gateway_resource.example.id\n  http_method   = \"GET\"\n  authorization = \"NONE\"\n}\n\nresource \"aws_api_gateway_integration\" \"example\" {\n  rest_api_id = aws_api_gateway_rest_api.example.id\n  resource_id = aws_api_gateway_resource.example.id\n  http_method = aws_api_gateway_method.example.http_method\n\n  type = \"HTTP\"\n  uri  = \"http://example.com\"\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable API Gateway logging and monitoring to track API usage and detect anomalies.",
+              "Use IAM roles and policies to control access to API Gateway resources.",
+              "Implement API keys and usage plans to manage and throttle API access.",
+              "Enable CORS with specific origins instead of allowing all origins.",
+              "Use AWS WAF to protect APIs from common web exploits."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Elastic Load Balancing"
+            ],
+            "protocols": [
+              "HTTP",
+              "HTTPS"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(230, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": -354.481735399604,
+        "y": 396.7231669532531
+      },
+      "data": {
+        "label": "Application Load Balancer",
+        "service": "Elastic Load Balancing",
+        "description": "Distributes traffic across EC2 instances for scalability",
+        "estCost": "$18/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/ELB.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Networking",
+        "details": {
+          "summary": "Elastic Load Balancing (ELB) automatically distributes incoming application traffic across multiple Amazon EC2 instances to ensure high availability and fault tolerance. In this architecture, ELB is connected to Amazon API Gateway and Amazon EC2, enabling it to route traffic efficiently and scale resources based on demand.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$10/mo",
+              "medium": "$80/mo",
+              "high": "$250/mo"
+            },
+            "pricingNotes": "Costs are based on the number of Load Balancer hours, data processed, and the type of ELB (Application, Network, or Classic). Additional charges may apply for cross-zone load balancing and data transfer."
+          },
+          "resilience": {
+            "scaling": "ELB automatically scales to handle traffic fluctuations, distributing load across healthy EC2 instances.",
+            "failover": "Cross-zone load balancing ensures traffic is distributed across multiple Availability Zones, providing failover in case of instance or zone failures."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const elb = new elbv2.ApplicationLoadBalancer(this, 'MyELB', {\n  vpc, \n  internetFacing: true\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "elb_client = boto3.client('elbv2')\nresponse = elb_client.create_load_balancer(\n    Name='MyELB',\n    Subnets=['subnet-12345678'],\n    SecurityGroups=['sg-12345678'],\n    Type='application'\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_lb\" \"my_elb\" {\n  name               = \"MyELB\"\n  internal           = false\n  load_balancer_type = \"application\"\n  subnets            = [\"subnet-12345678\"]\n  security_groups    = [\"sg-12345678\"]\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable HTTPS listeners and enforce TLS 1.2 or higher.",
+              "Use security groups to restrict inbound traffic to necessary IP ranges.",
+              "Regularly monitor access logs for suspicious activity."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon API Gateway",
+              "Amazon EC2"
+            ],
+            "protocols": [
+              "HTTP",
+              "HTTPS"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(43, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": -50.01948193252589,
+        "y": 404.7715397632108
+      },
+      "data": {
+        "label": "EC2 Auto Scaling Group",
+        "service": "Amazon EC2",
+        "description": "Hosts application servers for backend logic",
+        "estCost": "$200/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/EC2.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Compute",
+        "details": {
+          "summary": "Amazon EC2 (Elastic Compute Cloud) is a core component in this architecture, hosting the application servers responsible for executing backend logic. It provides scalable and resizable compute capacity, allowing the application to handle varying workloads efficiently. EC2 instances can be configured with different instance types, operating systems, and software packages to meet specific application requirements.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$25/mo",
+              "medium": "$200/mo",
+              "high": "$1000+/mo"
+            },
+            "pricingNotes": "EC2 costs vary based on instance type, usage duration, and region. For example, a t3.micro instance in the US East (N. Virginia) region costs $0.0116 per hour, while a c5.xlarge instance costs $0.085 per hour. Reserved Instances and Spot Instances can significantly reduce costs for steady-state and fault-tolerant workloads, respectively."
+          },
+          "resilience": {
+            "scaling": "EC2 instances can be scaled horizontally using Auto Scaling groups, ensuring the application can handle increased traffic. Integration with Elastic Load Balancing distributes traffic across multiple instances for improved fault tolerance.",
+            "failover": "Deploy instances across multiple Availability Zones (AZs) for high availability. Utilize EC2's integration with AWS CloudWatch and Lambda for automated recovery and instance replacement in case of failures."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const ec2Instance = new ec2.Instance(this, 'AppServer', {\n  instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),\n  machineImage: new ec2.AmazonLinuxImage(),\n  vpc: vpc,\n  securityGroup: securityGroup,\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "ec2 = boto3.resource('ec2')\ninstance = ec2.create_instances(\n    ImageId='ami-0c94855ba95c71c99',\n    MinCount=1,\n    MaxCount=1,\n    InstanceType='t3.micro',\n    SecurityGroupIds=['sg-0123456789abcdef0']\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_instance\" \"app_server\" {\n  ami           = \"ami-0c94855ba95c71c99\"\n  instance_type = \"t3.micro\"\n  subnet_id     = aws_subnet.main.id\n  vpc_security_group_ids = [aws_security_group.allow_ssh.id]\n}\n"
+          },
+          "security": {
+            "recommendations": [
+              "Apply the principle of least privilege by restricting inbound and outbound rules in Security Groups.",
+              "Regularly patch and update the operating system and applications running on EC2 instances.",
+              "Enable detailed monitoring using Amazon CloudWatch to detect and respond to security events.",
+              "Encrypt data in transit and at rest using AWS KMS and EBS encryption.",
+              "Implement IAM roles for EC2 instances to securely access other AWS services without exposing credentials."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Elastic Load Balancing",
+              "Amazon RDS",
+              "Amazon DynamoDB",
+              "AWS Lambda",
+              "Amazon CloudWatch"
+            ],
+            "protocols": [
+              "HTTP/HTTPS",
+              "TCP",
+              "UDP",
+              "RDS Proxy",
+              "DynamoDB API"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(277, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": -348.90372383542194,
+        "y": 401.1566829479501
+      },
+      "data": {
+        "label": "RDS PostgreSQL",
+        "service": "Amazon RDS",
+        "description": "Manages product catalog, orders, and user data",
+        "estCost": "$100/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/RDS.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Database",
+        "details": {
+          "summary": "Amazon RDS (Relational Database Service) is a managed database service that provides a scalable and highly available relational database. In this architecture, node4 is responsible for managing critical data, including the product catalog, orders, and user information. It serves as the central data store for the application, ensuring data integrity, security, and efficient retrieval.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$25/mo",
+              "medium": "$200/mo",
+              "high": "$1000+/mo"
+            },
+            "pricingNotes": "Cost varies based on database engine (e.g., MySQL, PostgreSQL), instance type, storage, and I/O operations. Reserved instances and storage optimization can reduce costs. High-end estimates include multi-AZ deployments and large-scale databases."
+          },
+          "resilience": {
+            "scaling": "RDS supports vertical scaling by modifying the instance type and horizontal read scaling via read replicas. Automatic backups and point-in-time recovery ensure data durability.",
+            "failover": "Multi-AZ deployments provide synchronous replication and automatic failover to a standby instance in a different Availability Zone."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const database = new rds.DatabaseInstance(this, 'ProductCatalogDB', {\n  engine: rds.DatabaseInstanceEngine.MYSQL,\n  instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MEDIUM),\n  multiAz: true,\n  allocatedStorage: 100,\n  vpc: vpc,\n  vpcSubnets: {\n    subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS\n  },\n  credentials: {\n    username: 'admin',\n    password: 'yourSecurePassword'\n  }\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "rds_client = boto3.client('rds')\ndb_instance = rds_client.create_db_instance(\n    DBName='product_catalog',\n    DBInstanceIdentifier='product-catalog-db',\n    AllocatedStorage=100,\n    DBInstanceClass='db.t3.medium',\n    Engine='mysql',\n    MasterUsername='admin',\n    MasterUserPassword='yourSecurePassword',\n    MultiAZ=True\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_db_instance\" \"product_catalog_db\" {\n  identifier           = \"product-catalog-db\"\n  engine               = \"mysql\"\n  instance_class       = \"db.t3.medium\"\n  allocated_storage    = 100\n  username             = \"admin\"\n  password             = \"yourSecurePassword\"\n  multi_az             = true\n  skip_final_snapshot  = true\n  vpc_security_group_ids = [aws_security_group.rds_sg.id]\n  db_subnet_group_name = aws_db_subnet_group.private_subnets.name\n}\n\nresource \"aws_db_subnet_group\" \"private_subnets\" {\n  name       = \"private-subnets\"\n  subnet_ids = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable encryption at rest using AWS KMS.",
+              "Restrict access using security groups and VPC endpoints.",
+              "Implement IAM authentication for database access.",
+              "Regularly rotate credentials and use strong password policies.",
+              "Enable logging and monitoring with Amazon CloudWatch and RDS Enhanced Monitoring."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon EC2",
+              "Amazon S3"
+            ],
+            "protocols": [
+              "MySQL/PostgreSQL (database connections)",
+              "HTTPS (for S3 integration via AWS SDK)"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(209, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": -49.840788219016176,
+        "y": 396.0801267724618
+      },
+      "data": {
+        "label": "DynamoDB",
+        "service": "Amazon DynamoDB",
+        "description": "Stores session data and shopping cart contents",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/DynamoDB.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Database",
+        "details": {
+          "summary": "Amazon DynamoDB is a fully managed NoSQL database service that provides fast and predictable performance with seamless scalability. In this architecture, DynamoDB is used to store session data and shopping cart contents, ensuring low-latency access to critical user-specific information. DynamoDB's single-digit millisecond performance makes it ideal for real-time data retrieval, enhancing the overall user experience.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$0.01/mo",
+              "medium": "$25/mo",
+              "high": "$200/mo"
+            },
+            "pricingNotes": "DynamoDB pricing is based on provisioned capacity (RCU/WCU) and storage. The low estimate assumes minimal usage with on-demand capacity. Medium usage considers moderate read/write operations and storage. High usage accounts for heavy traffic and larger storage needs."
+          },
+          "resilience": {
+            "scaling": "DynamoDB automatically scales based on provisioned capacity. Auto Scaling can adjust capacity in response to traffic patterns, ensuring optimal performance during peak loads.",
+            "failover": "DynamoDB replicates data across multiple Availability Zones within a Region, providing built-in fault tolerance and high availability without additional configuration."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const table = new dynamodb.Table(this, 'SessionCartTable', {\n  tableName: 'SessionCart',\n  partitionKey: { name: 'SessionId', type: dynamodb.AttributeType.STRING },\n  billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,\n  removalPolicy: cdk.RemovalPolicy.DESTROY,\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "dynamodb = boto3.resource('dynamodb')\ntable = dynamodb.create_table(\n    TableName='SessionCart',\n    KeySchema=[{'AttributeName': 'SessionId', 'KeyType': 'HASH'}],\n    AttributeDefinitions=[{'AttributeName': 'SessionId', 'AttributeType': 'S'}],\n    BillingMode='PAY_PER_REQUEST',\n    ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_dynamodb_table\" \"session_cart\" {\n  name           = \"SessionCart\"\n  hash_key       = \"SessionId\"\n  billing_mode   = \"PAY_PER_REQUEST\"\n  attribute {\n    name = \"SessionId\"\n    type = \"S\"\n  }\n  tags = {\n    Environment = \"production\"\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable DynamoDB encryption at rest using AWS Key Management Service (KMS) for data protection.",
+              "Implement IAM policies with least privilege to restrict access to the DynamoDB table.",
+              "Use AWS WAF to protect against web-based attacks targeting DynamoDB endpoints.",
+              "Regularly audit DynamoDB access logs and enable CloudWatch monitoring for suspicious activity."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon EC2",
+              "Amazon S3"
+            ],
+            "protocols": [
+              "HTTPS",
+              "AWS SDK"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(178, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": 245.28675508166728,
+        "y": 401.28404704939044
+      },
+      "data": {
+        "label": "Lambda (Image Processing)",
+        "service": "AWS Lambda",
+        "description": "Resizes and optimizes product images",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/Lambda.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Compute",
+        "details": {
+          "summary": "AWS Lambda is a serverless compute service that runs code in response to events and automatically manages the underlying compute resources. In this architecture, Lambda is used to resize and optimize product images, which are likely stored in Amazon S3. This is a common use case for Lambda, as it can efficiently process images without the need for provisioning or managing servers. The function is triggered by events, such as new image uploads to S3, and can be configured to automatically process images of various formats and sizes.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$0.01/mo",
+              "medium": "$5/mo",
+              "high": "$50/mo"
+            },
+            "pricingNotes": "AWS Lambda pricing is based on the number of requests, duration, and memory allocation. The estimated costs assume a varying number of image processing requests, with the low end representing minimal usage and the high end representing heavy usage. The actual cost will depend on the frequency and complexity of image resizing tasks."
+          },
+          "resilience": {
+            "scaling": "Lambda automatically scales to handle the incoming request volume. It can process multiple images concurrently, and the scaling is seamless, ensuring that image resizing tasks are completed efficiently even during peak loads.",
+            "failover": "As a managed service, Lambda provides built-in fault tolerance. If an instance fails, Lambda will automatically retry the function execution on a different instance. For critical image processing tasks, consider implementing idempotent functions to handle retries and ensure consistency."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const lambda = new lambda.Function(this, 'ImageResizer', {\n  runtime: lambda.Runtime.NODEJS_14_X,\n  code: lambda.Code.fromAsset('lambda'),\n  handler: 'index.handler',\n  memorySize: 512, // Adjust as needed for image processing\n  timeout: Duration.seconds(30), // Set an appropriate timeout\n});\nlambda.addEnvironment('BUCKET_NAME', s3Bucket.bucketName);"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\ndef lambda_handler(event, context):\n    s3 = boto3.client('s3')\n    bucket_name = event['Records'][0]['s3']['bucket']['name']\n    object_key = event['Records'][0]['s3']['object']['key']\n    # Download, resize, and optimize the image\n    # ... (image processing code)\n    # Upload the processed image back to S3\n    s3.upload_file('processed_image.jpg', bucket_name, 'resized/' + object_key)"
+          },
+          "terraform": {
+            "code": "resource \"aws_lambda_function\" \"image_resizer\" {\n  function_name = \"ImageResizer\"\n  role           = aws_iam_role.lambda_role.arn\n  handler        = \"index.handler\"\n  runtime        = \"nodejs14.x\"\n  memory_size    = 512 # Adjust as needed\n  timeout        = 30  # Set an appropriate timeout\n  \n  environment {\n    variables = {\n      BUCKET_NAME = aws_s3_bucket.images.bucket\n    }\n  }\n}\n\nresource \"aws_lambda_permission\" \"allow_bucket\" {\n  statement_id  = \"AllowExecutionFromS3\"\n  action        = \"lambda:InvokeFunction\"\n  function_name = aws_lambda_function.image_resizer.function_name\n  principal     = \"s3.amazonaws.com\"\n  source_arn    = aws_s3_bucket.images.arn\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Ensure that the Lambda execution role has the least privileged permissions, allowing only necessary actions on S3 and other resources.",
+              "Encrypt sensitive data, such as API keys or secrets, using AWS KMS and store them in environment variables or AWS Systems Manager Parameter Store.",
+              "Implement server-side encryption for images stored in S3 to protect data at rest.",
+              "Regularly update the Lambda function code and dependencies to address security vulnerabilities."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon EC2",
+              "Amazon S3"
+            ],
+            "protocols": [
+              "AWS Lambda can be triggered by various events, including S3 object creation events, allowing seamless integration with S3 for image processing. It can also be invoked by other AWS services or HTTP requests via API Gateway, enabling flexible integration with EC2 instances or other applications."
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(153, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": 247.47115206342218,
+        "y": 395.0937218870178
+      },
+      "data": {
+        "label": "S3 (Image Storage)",
+        "service": "Amazon S3",
+        "description": "Stores original and processed product images",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/S3.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Storage",
+        "details": {
+          "summary": "This node is an Amazon S3 bucket that stores original and processed product images. It serves as a durable and scalable storage solution for image data, which can be accessed by other services like AWS Lambda for processing and Amazon CloudFront for distribution. S3 is a highly available and secure service, offering features like versioning, encryption, and access control.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$5/mo",
+              "medium": "$50/mo",
+              "high": "$200/mo"
+            },
+            "pricingNotes": "The cost of using Amazon S3 depends on the amount of data stored, the number of requests made, and the type of storage class used. The estimated monthly costs are based on storing 10GB (low), 100GB (medium), and 1TB (high) of data with standard request patterns."
+          },
+          "resilience": {
+            "scaling": "Amazon S3 automatically scales to handle the amount of data stored and the number of requests made. It can handle virtually unlimited storage and requests.",
+            "failover": "S3 provides high availability and durability by replicating data across multiple Availability Zones. In case of a failure, S3 automatically fails over to a healthy replica."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const bucket = new s3.Bucket(this, 'ProductImagesBucket', {\n  versioned: true,\n  encryption: s3.BucketEncryption.S3_MANAGED,\n  removalPolicy: cdk.RemovalPolicy.RETAIN\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "s3 = boto3.client('s3')\n\nbucket_name = 'product-images-bucket'\n\ns3.create_bucket(Bucket=bucket_name)\n\ns3.put_bucket_versioning(Bucket=bucket_name, VersioningConfiguration={'Status': 'Enabled'})\n\ns3.put_bucket_encryption(Bucket=bucket_name, ServerSideEncryptionConfiguration={'Rules': [{'ApplyServerSideEncryptionByDefault': {'SSEAlgorithm': 'AES256'}}]})"
+          },
+          "terraform": {
+            "code": "resource \"aws_s3_bucket\" \"product_images_bucket\" {\n  bucket = \"product-images-bucket\"\n  versioning {\n    enabled = true\n  }\n  server_side_encryption_configuration {\n    rule {\n      apply_server_side_encryption_by_default {\n        sse_algorithm = \"AES256\"\n      }\n    }\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable server-side encryption (SSE) using AES-256 or AWS KMS.",
+              "Implement bucket policies and IAM policies to control access to the bucket and its objects.",
+              "Enable versioning to protect against accidental deletions or overwrites.",
+              "Use Amazon Macie to discover and classify sensitive data stored in the bucket.",
+              "Regularly review and audit access logs to detect and respond to suspicious activities."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "AWS Lambda",
+              "Amazon CloudFront"
+            ],
+            "protocols": [
+              "HTTPS",
+              "Amazon S3 API"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(337, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node8",
+      "type": "awsService",
+      "position": {
+        "x": 245.14455109179016,
+        "y": 396.70414348346
+      },
+      "data": {
+        "label": "CloudFront",
+        "service": "Amazon CloudFront",
+        "description": "Delivers images and static assets with low latency",
+        "estCost": "$30/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/CloudFront.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Networking",
+        "details": {
+          "summary": "Amazon CloudFront is a content delivery network (CDN) that caches content in a globally-distributed network of proxy servers to improve access speed for downloading content. It delivers images and static assets with low latency by serving them from edge locations closer to users. CloudFront integrates with Amazon S3 to distribute content efficiently. CloudFront Functions allows customizations at the edge using lightweight JavaScript functions for tasks like authentication and response manipulation. The service operates on a pay-as-you-go basis and is highly scalable, handling millions of requests per second.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$10/mo",
+              "medium": "$80/mo",
+              "high": "$250/mo"
+            },
+            "pricingNotes": "Costs vary based on data transfer volume, request count, and edge location usage. Free Tier usage may apply for low-volume workloads."
+          },
+          "resilience": {
+            "scaling": "Automatically scales to handle millions of requests per second with submillisecond startup times.",
+            "failover": "Leverages globally distributed edge locations for automatic failover and high availability."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const distribution = new cloudfront.Distribution(this, 'MyDistribution', {\n  defaultBehavior: { origin: new origins.S3Origin(bucket) },\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\ncloudfront = boto3.client('cloudfront')\nresponse = cloudfront.create_distribution(Origin={\n    'DomainName': 'your-bucket.s3.amazonaws.com',\n    'OriginId': 'S3-your-bucket'\n})"
+          },
+          "terraform": {
+            "code": "resource \"aws_cloudfront_distribution\" \"s3_distribution\" {\n  origin {\n    domain_name = aws_s3_bucket.bucket.bucket_regional_domain_name\n    origin_id   = \"S3-your-bucket\"\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable HTTPS for secure content delivery",
+              "Use CloudFront Functions for edge-based authentication",
+              "Implement geo-restriction for sensitive content"
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon S3"
+            ],
+            "protocols": [
+              "HTTP",
+              "HTTPS"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(231, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node9",
+      "type": "awsService",
+      "position": {
+        "x": 550.1238902435747,
+        "y": 401.2869898117392
+      },
+      "data": {
+        "label": "S3 (Backups)",
+        "service": "Amazon S3",
+        "description": "Stores daily backups of RDS and DynamoDB",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/S3.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Storage",
+        "details": {
+          "summary": "Amazon S3 service in the architecture",
+          "costEstimation": {
+            "monthly": {
+              "low": "Varies",
+              "medium": "Varies",
+              "high": "Varies"
+            },
+            "pricingNotes": "Cost depends on usage patterns"
+          },
+          "resilience": {
+            "scaling": "Auto-scaling available",
+            "failover": "Depends on configuration"
+          },
+          "security": {
+            "recommendations": [
+              "Follow AWS security best practices"
+            ]
+          },
+          "integration": {
+            "connectedTo": [],
+            "protocols": []
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(231, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node10",
+      "type": "awsService",
+      "position": {
+        "x": 554.9804403947863,
+        "y": 399.28968095390354
+      },
+      "data": {
+        "label": "CloudWatch",
+        "service": "Amazon CloudWatch",
+        "description": "Monitors application performance and logs",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/CloudWatch.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Management",
+        "details": {
+          "summary": "Amazon CloudWatch is a monitoring and observability service that collects data and provides actionable insights into AWS resources, including Amazon EC2 instances. It helps in monitoring application performance, setting alarms, and automating responses to performance changes. Amazon EC2 is a cloud computing service that provides scalable virtual servers for running applications.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$0.50/mo",
+              "medium": "$10/mo",
+              "high": "$1,000+/mo"
+            },
+            "pricingNotes": "CloudWatch pricing is based on data ingestion, storage, and additional features like alarms and metric streams. EC2 pricing is based on instance type, usage duration, and additional services."
+          },
+          "resilience": {
+            "scaling": "CloudWatch integrates with EC2 to auto-scale instances based on performance metrics and alarms.",
+            "failover": "CloudWatch can detect failures and trigger automated responses to maintain application availability."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "import * as cdk from 'aws-cdk-lib';\nimport { Construct } from 'constructs';\nimport * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';\nimport * as ec2 from 'aws-cdk-lib/aws-ec2';\n\nexport class CloudWatchStack extends cdk.Stack {\n  constructor(scope: Construct, id: string, props?: cdk.StackProps) {\n    super(scope, id, props);\n\n    // Create an EC2 instance\n    const vpc = new ec2.Vpc(this, 'Vpc');\n    const instance = new ec2.Instance(this, 'Instance', {\n      vpc,\n      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO),\n      machineImage: new ec2.AmazonLinuxImage(),\n    });\n\n    // Set up CloudWatch Alarm for CPU utilization\n    const alarm = new cloudwatch.Alarm(this, 'CpuAlarm', {\n      metric: new cloudwatch.Metric({\n        namespace: 'AWS/EC2',\n        metricName: 'CPUUtilization',\n        dimensionsMap: { InstanceId: instance.instanceId },\n      }),\n      threshold: 70,\n      evaluationPeriods: 2,\n    });\n  }\n}"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\nec2 = boto3.client('ec2')\ncloudwatch = boto3.client('cloudwatch')\n\n# Start an EC2 instance\nresponse = ec2.run_instances(ImageId='ami-0c55b159cbfafe1f0', MinCount=1, MaxCount=1, InstanceType='t2.micro')\ninstance_id = response['Instances'][0]['InstanceId']\n\n# Create a CloudWatch Alarm for CPU utilization\ncloudwatch.put_metric_alarm(\n    AlarmName='CpuAlarm',\n    ComparisonOperator='GreaterThanThreshold',\n    EvaluationPeriods=2,\n    MetricName='CPUUtilization',\n    Namespace='AWS/EC2',\n    Period=60,\n    Statistic='Average',\n    Threshold=70,\n    Dimensions=[{\n        'Name': 'InstanceId',\n        'Value': instance_id\n    }],\n    ActionsEnabled=True,\n)\n"
+          },
+          "terraform": {
+            "code": "provider \"aws\" {\n  region = \"us-east-1\"\n}\n\nresource \"aws_instance\" \"example\" {\n  ami           = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"t2.micro\"\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"cpu_alarm\" {\n  alarm_name          = \"cpu-alarm\"\n  comparison_operator = \"GreaterThanThreshold\"\n  evaluation_periods  = 2\n  metric_name         = \"CPUUtilization\"\n  namespace           = \"AWS/EC2\"\n  period              = 60\n  statistic           = \"Average\"\n  threshold           = 70\n  dimensions = {\n    InstanceId = aws_instance.example.id\n  }\n}\n"
+          },
+          "security": {
+            "recommendations": [
+              "Enable CloudWatch encryption for log data.",
+              "Use IAM roles with least privilege for CloudWatch and EC2 access.",
+              "Monitor CloudWatch alarms for suspicious activity."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon EC2",
+              "AWS Lambda",
+              "Amazon S3",
+              "Amazon RDS"
+            ],
+            "protocols": [
+              "HTTP",
+              "HTTPS",
+              "MQTT"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(357, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Routes API requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node2",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Distributes traffic",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node3",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Queries product and order data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node3",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Manages session and cart data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node3",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers image processing",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node6",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Stores processed images",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node7",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Distributes images globally",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge8",
+      "source": "node4",
+      "target": "node9",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Backs up database daily",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge9",
+      "source": "node5",
+      "target": "node9",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Backs up session data daily",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge10",
+      "source": "node3",
+      "target": "node10",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Sends logs and metrics",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Using AWS, Design a well architected backend for e-commerce platforms selling cloth retail, so the platform will have extensive image processing, storage, data and more",
+    "rationale": "Generated using Cohere Command A (March 2025) - 10 services with 2 icons resolved",
+    "timestamp": "2025-07-11T03:27:12.308Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-07-11T03:27:12.308Z",
+    "lastEditedBy": "Generator"
+  }
+}

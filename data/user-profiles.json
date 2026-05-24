@@ -1,0 +1,37 @@
+[
+  {
+    "id": "20a1d868-66d4-47ac-946f-87a22c89e5bc",
+    "planId": "free",
+    "createdAt": "2026-05-24T00:52:36.570Z",
+    "byokKeys": {},
+    "usageDay": "2026-05-24",
+    "usage": {
+      "calls": 0,
+      "tokens": 0,
+      "costUsd": 0
+    }
+  },
+  {
+    "id": "150b73db-3c3b-46dc-93b6-0a682b32817f",
+    "planId": "pro",
+    "createdAt": "2026-05-24T00:53:03.965Z",
+    "byokKeys": {
+      "openai": {
+        "ciphertext": "dMZsfBSybt1aGPqcXbRQ9z4fr3bq4IDn0F2wAQ==",
+        "nonce": "P1WOnii3j0rBLLPj",
+        "tag": "z9wHhRjQy5hCNdsXdd/Hpg=="
+      },
+      "anthropic": {
+        "ciphertext": "lQOs4uaSaPipH4qO0TLhmm5KUCcMow==",
+        "nonce": "/fUeqrZ09Es+ERwZ",
+        "tag": "0+gY3jfNh/DUL/fr6n1sEg=="
+      }
+    },
+    "usageDay": "2026-05-24",
+    "usage": {
+      "calls": 0,
+      "tokens": 0,
+      "costUsd": 0
+    }
+  }
+]

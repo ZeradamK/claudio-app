@@ -1,0 +1,594 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": -50.547314700843316,
+        "y": 399.54874549324416
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Exposes RESTful APIs for client applications to interact with the backend",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Networking",
+        "details": {
+          "summary": "Amazon API Gateway is a fully managed service that makes it easy for developers to create, publish, maintain, monitor, and secure APIs at any scale. In this architecture, API Gateway acts as the front door for client applications to interact with backend services via RESTful APIs. It handles requests from clients, routes them to the appropriate AWS Lambda functions, and manages security and access control through integration with Amazon Cognito.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$10/mo",
+              "medium": "$80/mo",
+              "high": "$250/mo"
+            },
+            "pricingNotes": "API Gateway pricing is based on the number of API calls, data transfer, and optional features like request/response transformations. The low estimate assumes minimal usage (e.g., 1 million requests), while the high estimate accounts for heavy usage (e.g., 100 million requests) and additional features."
+          },
+          "resilience": {
+            "scaling": "API Gateway automatically scales to handle incoming request volumes without manual intervention.",
+            "failover": "Built-in failover mechanisms ensure high availability across multiple AWS regions."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const api = new apigateway.RestApi(this, 'MyApi', {\n  restApiName: 'Service API',\n  description: 'API Gateway for client applications'\n});\napi.root.addMethod('ANY', new apigateway.LambdaIntegration(lambdaFunction));"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\nclient = boto3.client('apigateway')\nresponse = client.create_rest_api(\n    name='MyApi',\n    description='API Gateway for client applications'\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_api_gateway_rest_api\" \"example\" {\n  name        = \"MyApi\"\n  description = \"API Gateway for client applications\"\n}\nresource \"aws_api_gateway_resource\" \"example\" {\n  rest_api_id = aws_api_gateway_rest_api.example.id\n  path_part   = \"example\"\n}\nresource \"aws_api_gateway_method\" \"example\" {\n  rest_api_id   = aws_api_gateway_rest_api.example.id\n  resource_id   = aws_api_gateway_resource.example.id\n  http_method   = \"GET\"\n  authorization = \"NONE\"\n}\nresource \"aws_api_gateway_integration\" \"example\" {\n  rest_api_id = aws_api_gateway_rest_api.example.id\n  resource_id = aws_api_gateway_resource.example.id\n  http_method = aws_api_gateway_method.example.http_method\n  integration_http_method = \"POST\"\n  type                    = \"AWS_PROXY\"\n  uri                     = aws_lambda_function.example.invoke_arn\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable Amazon Cognito User Pool integration for authentication and authorization.",
+              "Use API keys and usage plans to manage access and rate limits.",
+              "Implement resource policies to restrict API access to specific IP ranges or AWS accounts.",
+              "Enable AWS WAF to protect against common web exploits and bots."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "AWS Lambda",
+              "Amazon CloudFront",
+              "Amazon Cognito"
+            ],
+            "protocols": [
+              "HTTPS",
+              "WebSocket"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(93, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": -200.64797828485348,
+        "y": 398.59458956456916
+      },
+      "data": {
+        "label": "Lambda - Geocoding",
+        "service": "AWS Lambda",
+        "description": "Handles geocoding requests (address to coordinates) using a third-party service or custom logic",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/Lambda.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Compute",
+        "details": {
+          "summary": "This AWS Lambda function is designed to handle geocoding requests, converting addresses to geographic coordinates. It can utilize either a third-party geocoding service or custom logic for this process. The function is triggered by requests from Amazon API Gateway and stores or retrieves data from Amazon DynamoDB, making it a crucial component in location-based services or applications requiring address-to-coordinate conversions.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$0.20/mo",
+              "medium": "$5/mo",
+              "high": "$50/mo"
+            },
+            "pricingNotes": "AWS Lambda pricing is based on the number of requests and the duration of execution, with a free tier available. Costs can vary significantly depending on usage patterns and the complexity of the geocoding logic or third-party service integration."
+          },
+          "resilience": {
+            "scaling": "Lambda automatically scales with the number of incoming requests, ensuring high availability and low latency.",
+            "failover": "Built-in failover is provided by Lambda's multi-AZ deployment, ensuring requests are handled even if one availability zone becomes unavailable."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const lambda = new lambda.Function(this, 'GeocodingLambda', {\n  runtime: lambda.Runtime.NODEJS_14_X,\n  handler: 'index.handler',\n  code: lambda.Code.fromAsset('lambda'),\n  environment: {\n    DYNAMODB_TABLE: 'GeocodingTable',\n  },\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\nlambda_client = boto3.client('lambda')\n\ndef lambda_handler(event, context):\n    response = lambda_client.invoke(\n        FunctionName='GeocodingLambda',\n        Payload=json.dumps(event)\n    )\n    return response['Payload'].read()"
+          },
+          "terraform": {
+            "code": "resource \"aws_lambda_function\" \"geocoding_lambda\" {\n  filename      = \"lambda_function.zip\"\n  function_name = \"GeocodingLambda\"\n  role          = aws_iam_role.lambda_role.arn\n  handler       = \"index.handler\"\n  runtime       = \"nodejs14.x\"\n  environment {\n    variables = {\n      DYNAMODB_TABLE = \"GeocodingTable\"\n    }\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Ensure the Lambda function has the least privileged IAM role, granting only necessary permissions to DynamoDB and any third-party services.",
+              "Encrypt sensitive data at rest and in transit, especially when dealing with location data.",
+              "Implement rate limiting and monitoring to prevent abuse and detect anomalies in geocoding requests."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon API Gateway",
+              "Amazon DynamoDB"
+            ],
+            "protocols": [
+              "HTTPS (for API Gateway integration)",
+              "AWS SDK (for DynamoDB interaction)"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(90, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": 98.13620494281389,
+        "y": 401.8382318469936
+      },
+      "data": {
+        "label": "Lambda - Routing",
+        "service": "AWS Lambda",
+        "description": "Calculates routes between points using a third-party service or custom algorithm",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/Lambda.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Compute",
+        "details": {
+          "summary": "This AWS Lambda function calculates routes between points using a third-party service or custom algorithm. It is connected to Amazon API Gateway for receiving requests and Amazon DynamoDB for storing and retrieving data. The function is designed to be scalable and cost-effective, with security measures in place to protect sensitive data.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$0.20/mo",
+              "medium": "$5/mo",
+              "high": "$50/mo"
+            },
+            "pricingNotes": "AWS Lambda charges are based on the number of requests and the duration of execution. The estimated costs assume 1 million requests per month with an average execution duration of 100ms. Costs may vary depending on the complexity of the routing algorithm and the volume of requests."
+          },
+          "resilience": {
+            "scaling": "AWS Lambda automatically scales to handle the incoming request volume, ensuring high availability and low latency.",
+            "failover": "Lambda functions can be deployed across multiple availability zones for fault tolerance. In case of failures, Lambda automatically retries the execution with exponential backoff."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const lambda = new lambda.Function(this, 'RouteCalculator', {\n  runtime: lambda.Runtime.NODEJS_14_X,\n  handler: 'index.handler',\n  code: lambda.Code.fromAsset('lambda'),\n  environment: {\n    DYNAMODB_TABLE_NAME: dynamoDBTable.tableName,\n  },\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\nclient = boto3.client('lambda')\n\ndef lambda_handler(event, context):\n    response = client.invoke(\n        FunctionName='RouteCalculator',\n        Payload=json.dumps(event)\n    )\n    return response['Payload'].read()"
+          },
+          "terraform": {
+            "code": "resource \"aws_lambda_function\" \"route_calculator\" {\n  function_name = \"RouteCalculator\"\n  handler       = \"index.handler\"\n  runtime       = \"nodejs14.x\"\n  role          = aws_iam_role.lambda_role.arn\n  filename      = \"lambda.zip\"\n  source_code_hash = filebase64sha256(\"lambda.zip\")\n  environment {\n    variables = {\n      DYNAMODB_TABLE_NAME = aws_dynamodb_table.route_data.name\n    }\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Implement IAM roles with least privilege for Lambda execution.",
+              "Encrypt sensitive data at rest and in transit using AWS KMS.",
+              "Enable AWS CloudTrail to monitor and log Lambda function invocations.",
+              "Regularly update the Lambda function code and dependencies to address security vulnerabilities."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon API Gateway",
+              "Amazon DynamoDB"
+            ],
+            "protocols": [
+              "HTTPS (API Gateway)",
+              "AWS SDK (DynamoDB)"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(163, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": -50.64906768434659,
+        "y": 403.04657584789584
+      },
+      "data": {
+        "label": "DynamoDB - Location Data",
+        "service": "Amazon DynamoDB",
+        "description": "Stores points of interest, user preferences, and other location-related data",
+        "estCost": "$30/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/DynamoDB.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Database",
+        "details": {
+          "summary": "Amazon DynamoDB is a fully managed NoSQL database service that provides fast and consistent performance at any scale. It is designed for applications that require low latency and predictable performance. DynamoDB is a good fit for storing points of interest, user preferences, and other location-related data due to its ability to handle high-traffic and extreme-scaled events with nearly unlimited throughput. DynamoDB scales to zero, has no cold starts, no version upgrades, no maintenance windows, no patching, and no downtime maintenance. DynamoDB offers a broad set of security controls and compliance standards. For globally distributed applications, DynamoDB global tables is a multi-Region, multi-active database with a 99.999% availability SLA and increased resilience. DynamoDB reliability is supported with managed backups, point-in-time recovery, and more.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$10/mo",
+              "medium": "$80/mo",
+              "high": "$250/mo"
+            },
+            "pricingNotes": "The best way to calculate the monthly cost of DynamoDB is to utilize the AWS Pricing Calculator. This simple, interactive tool provides the ability to estimate monthly costs based on read and write throughput along with chargeable options, including change data capture, data import and export to Amazon S3, and backup and restore."
+          },
+          "resilience": {
+            "scaling": "DynamoDB is a fully managed, highly scalable non-relational database service. DynamoDB removes traditional scalability limitations on data storage while maintaining low latency and predictable performance.",
+            "failover": "DynamoDB offers multi-Region replication and multi-active databases for globally distributed applications, ensuring high availability and disaster recovery capabilities."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "import * as cdk from 'aws-cdk-lib';\nimport { Construct } from 'constructs';\nimport * as dynamodb from 'aws-cdk-lib/aws-dynamodb';\n\nexport class DynamoDBStack extends cdk.Stack {\n  constructor(scope: Construct, id: string, props?: cdk.StackProps) {\n    super(scope, id, props);\n\n    // Define a DynamoDB table\n    const table = new dynamodb.Table(this, 'PointsOfInterestTable', {\n      tableName: 'PointsOfInterest',\n      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },\n      removalPolicy: cdk.RemovalPolicy.DESTROY,\n    });\n  }\n}"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\ndynamodb = boto3.resource('dynamodb')\n\n# Create a table\ntable = dynamodb.create_table(\n    TableName='PointsOfInterest',\n    KeySchema=[\n        {'AttributeName': 'id', 'KeyType': 'HASH'}\n    ],\n    AttributeDefinitions=[\n        {'AttributeName': 'id', 'AttributeType': 'S'}\n    ],\n    ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}\n)\n\n# Wait until the table exists\ntable.meta.client.get_waiter('table_exists').wait(TableName='PointsOfInterest')"
+          },
+          "terraform": {
+            "code": "resource \"aws_dynamodb_table\" \"points_of_interest\" {\n  name           = \"PointsOfInterest\"\n  billing_mode   = \"PAY_PER_REQUEST\"\n  hash_key       = \"id\"\n  attribute {\n    name = \"id\"\n    type = \"S\"\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "DynamoDB encrypts at rest all user data stored in tables, indexes, streams, and backups using encryption keys stored in AWS Key Management Service (AWS KMS).",
+              "For users, applications, and other AWS services to access DynamoDB, they must include valid AWS credentials in their AWS API requests.",
+              "DynamoDB complies with industry standards such as ISO 27001, ISO 27701, and PCI DSS to maintain security and secure operating standards."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "AWS Lambda",
+              "AWS Lambda"
+            ],
+            "protocols": [
+              "HTTPS",
+              "VPC Endpoints"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(40, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": 248.73500226534216,
+        "y": 402.46593258000377
+      },
+      "data": {
+        "label": "S3 - Map Tiles",
+        "service": "Amazon S3",
+        "description": "Stores pre-rendered map tiles for efficient delivery",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/S3.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Storage",
+        "details": {
+          "summary": "Amazon S3 is a robust and affordable way to publish maps online by storing pre-rendered map tiles for efficient delivery",
+          "costEstimation": {
+            "monthly": {
+              "low": "$10/mo",
+              "medium": "$80/mo",
+              "high": "$250/mo"
+            },
+            "pricingNotes": "The total cost of using S3 depends on the amount of storage, the amount of data transferred every month, and the number of requests made monthly"
+          },
+          "resilience": {
+            "scaling": "Amazon S3 is highly scalable and offers a cost-effective solution for data storage needs",
+            "failover": "Amazon S3 provides client-side encryption options and allows using HTTPS (TLS) to prevent potential attackers from eavesdropping on or manipulating network traffic"
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "import * as cdk from '@aws-cdk/core';\nimport * as s3 from '@aws-cdk/aws-s3';\n\nexport class BucketResourceStack extends cdk.Stack {\nconstructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {\nsuper(scope, id, props);\n\nnew s3.Bucket(this, 'MyFirstBucket', {\nbucketName: 'my-first-bucket',\npublicReadAccess: true,\nremovalPolicy: cdk.RemovalPolicy.DESTROY\n});\n}\n}"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import software.amazon.awssdk.regions.Region;\nimport software.amazon.awssdk.services.s3.S3Client;\nimport software.amazon.awssdk.services.s3.model.Bucket;\nimport software.amazon.awssdk.services.s3.model.ListBucketsResponse;\nimport software.amazon.awssdk.services.s3.model.S3Exception;\n\npublic class HelloS3 {\npublic static void main(String[] args) {\nRegion region = Region.US_EAST_1;\nS3Client s3 = S3Client.builder()\n.region(region)\n.build();\nlistBuckets(s3);\n}\n}"
+          },
+          "terraform": {
+            "code": "Using the resource block, we've defined a new resource of type aws_s3_bucket. This tells Terraform that we want to create a new S3 bucket in our AWS account.\nInside the aws_s3_bucket block, we've specified the name of our bucket using the bucket field.\nBefore we can apply our configuration and create the S3 bucket, we need to initialize the Terraform module by running terraform init in our terminal."
+          },
+          "security": {
+            "recommendations": [
+              "Amazon S3 provides multiple client-side encryption options",
+              "Use HTTPS (TLS) to help prevent potential attackers from eavesdropping on or manipulating network traffic by using person-in-the-middle or similar attacks",
+              "Allowing only encrypted connections over HTTPS (TLS) by using the aws:SecureTransport condition in your Amazon S3 bucket policies",
+              "Regularly check the security advisories posted in Trusted Advisor for your AWS account",
+              "Actively monitor the primary email address that's registered to each of your AWS accounts"
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon CloudFront"
+            ],
+            "protocols": [
+              "OGC WMTS"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(242, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": 248.87153329154918,
+        "y": 400.5665926017822
+      },
+      "data": {
+        "label": "CloudFront",
+        "service": "Amazon CloudFront",
+        "description": "Delivers map tiles and API responses with low latency",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/CloudFront.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Networking",
+        "details": {
+          "summary": "Amazon CloudFront is a content delivery network (CDN) service that securely delivers data, videos, applications, and APIs to customers globally with low latency. In this architecture, CloudFront is used to deliver map tiles and API responses efficiently, reducing the load on the origin servers and improving user experience.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$25/mo",
+              "medium": "$200/mo",
+              "high": "$1000/mo"
+            },
+            "pricingNotes": "CloudFront pricing is based on data transfer out, number of HTTP/HTTPS requests, and additional features like Lambda@Edge usage. The cost can vary significantly based on traffic volume and region."
+          },
+          "resilience": {
+            "scaling": "CloudFront automatically scales to handle traffic spikes without manual intervention.",
+            "failover": "CloudFront provides built-in failover to alternate origins if the primary origin is unavailable, ensuring high availability."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const distribution = new cloudfront.Distribution(this, 'MapTileDistribution', {\n  defaultBehavior: { origin: new origins.S3Origin(bucket) },\n  defaultRootObject: 'index.html',\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\ncloudfront = boto3.client('cloudfront')\nresponse = cloudfront.create_distribution(DistributionConfig={\n    'Origins': {'Items': [{'Id': 'S3Origin', 'DomainName': 'your-bucket.s3.amazonaws.com'}]},\n    'DefaultCacheBehavior': {'TargetOriginId': 'S3Origin', 'ViewerProtocolPolicy': 'redirect-to-https'}\n})"
+          },
+          "terraform": {
+            "code": "resource \"aws_cloudfront_distribution\" \"map_tile_distribution\" {\n  origin {\n    domain_name = aws_s3_bucket.map_tiles.bucket_regional_domain_name\n    origin_id   = \"S3Origin\"\n  }\n  default_cache_behavior {\n    target_origin_id = \"S3Origin\"\n    viewer_protocol_policy = \"redirect-to-https\"\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable HTTPS for all CloudFront distributions to encrypt data in transit.",
+              "Use signed URLs or signed cookies to restrict access to content.",
+              "Implement geo-restriction to control access based on user location.",
+              "Regularly monitor CloudFront access logs for suspicious activity."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon API Gateway",
+              "Amazon S3"
+            ],
+            "protocols": [
+              "HTTPS",
+              "HTTP"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(131, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": 402.0503346336801,
+        "y": 395.2187266917694
+      },
+      "data": {
+        "label": "Cognito",
+        "service": "Amazon Cognito",
+        "description": "Manages user authentication and authorization",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/Cognito.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Security",
+        "details": {
+          "summary": "Amazon Cognito is a user identity and app data synchronization service that helps you securely manage and synchronize user data across devices. In this architecture, it is used to manage user authentication and authorization, providing a secure way to handle user identities and access control. It integrates with Amazon API Gateway to protect your APIs, ensuring that only authenticated and authorized users can access them.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$0.005/mo",
+              "medium": "$0.05/mo",
+              "high": "$0.50/mo"
+            },
+            "pricingNotes": "Amazon Cognito pricing is based on the number of monthly active users (MAU) and the number of sync operations. The cost estimate provided is per MAU, with the low end representing a small number of users and minimal sync operations, the medium representing a moderate number of users and sync operations, and the high end representing a large number of users and frequent sync operations."
+          },
+          "resilience": {
+            "scaling": "Amazon Cognito automatically scales to handle the number of users and authentication requests, ensuring high availability and low latency.",
+            "failover": "It provides built-in redundancy and failover mechanisms to ensure that user authentication and authorization services remain available even in the event of failures."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const userPool = new cognito.UserPool(this, 'MyUserPool', {\n  userPoolName: 'MyUserPool',\n  selfSignUpEnabled: true,\n  autoVerify: { email: true },\n  signInAliases: { email: true },\n  standardAttributes: { fullname: { required: true, mutable: true } },\n  passwordPolicy: { minLength: 8, requireLowercase: true, requireUppercase: true, requireDigits: true, requireSymbols: true },\n  accountRecovery: cognito.AccountRecovery.EMAIL_ONLY\n});\n\nconst userPoolClient = new cognito.UserPoolClient(this, 'MyUserPoolClient', {\n  userPool: userPool,\n  generateSecret: false,\n  authFlows: { userPassword: true, userSrp: true },\n  oAuth: { scopes: [cognito.OAuthScope.EMAIL, cognito.OAuthScope.OPENID, cognito.OAuthScope.PROFILE] }\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\ncognito_client = boto3.client('cognito-idp')\n\nresponse = cognito_client.admin_create_user(\n    UserPoolId='us-east-1_123456789',\n    Username='user@example.com',\n    UserAttributes=[\n        {'Name': 'email', 'Value': 'user@example.com'},\n        {'Name': 'email_verified', 'Value': 'true'}\n    ],\n    TemporaryPassword='TempPass123!',\n    MessageAction='SUPPRESS'\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_cognito_user_pool\" \"my_user_pool\" {\n  name = \"my-user-pool\"\n  username_attributes = [\"email\"]\n  auto_verified_attributes = [\"email\"]\n  password_policy {\n    minimum_length = 8\n    require_lowercase = true\n    require_uppercase = true\n    require_numbers = true\n    require_symbols = true\n  }\n  account_recovery_setting {\n    recovery_mechanism {\n      name = \"verified_email\"\n      priority = 1\n    }\n  }\n}\n\nresource \"aws_cognito_user_pool_client\" \"my_user_pool_client\" {\n  name = \"my-user-pool-client\"\n  user_pool_id = aws_cognito_user_pool.my_user_pool.id\n  generate_secret = false\n  explicit_auth_flows = [\"USER_PASSWORD_AUTH\", \"ALLOW_USER_SRP_AUTH\"]\n  supported_identity_providers = [\"COGNITO\"]\n  callback_urls = [\"https://example.com/callback\"]\n  logout_urls = [\"https://example.com/logout\"]\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable Multi-Factor Authentication (MFA) for added security.",
+              "Use secure password policies, including length and complexity requirements.",
+              "Regularly rotate credentials and enforce strong password policies.",
+              "Monitor user authentication activities for suspicious behavior.",
+              "Implement role-based access control (RBAC) to restrict access to sensitive resources."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon API Gateway"
+            ],
+            "protocols": [
+              "OAuth 2.0",
+              "OpenID Connect"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(163, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers geocoding Lambda function",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node1",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers routing Lambda function",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node2",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Retrieves/stores location data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node3",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Retrieves/stores location data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node1",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Delivers API responses via CloudFront",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node5",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Serves map tiles via CloudFront",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node1",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Authenticates users via Cognito",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Using AWS, design a serverless architecture for a google maps like app",
+    "rationale": "Generated using Cohere Command A (March 2025) - 7 services with 1 icons resolved",
+    "timestamp": "2025-07-08T19:40:10.661Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-07-08T19:40:10.661Z",
+    "lastEditedBy": "Generator"
+  }
+}

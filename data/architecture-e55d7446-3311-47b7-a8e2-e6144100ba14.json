@@ -1,0 +1,386 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": 95.77879462321869,
+        "y": 401.69045577408457
+      },
+      "data": {
+        "label": "CloudFront",
+        "service": "Amazon CloudFront",
+        "description": "Serves static assets and caches API responses",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": -353.0474549097365,
+        "y": 398.87428280702034
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Routes API requests to Lambda functions",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/API-Gateway.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": -52.36358157511079,
+        "y": 398.1662576709281
+      },
+      "data": {
+        "label": "Lambda (API)",
+        "service": "AWS Lambda",
+        "description": "Handles API business logic",
+        "estCost": "$10/month",
+        "faultTolerance": "Medium",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": -203.56342528614053,
+        "y": 403.72921921054547
+      },
+      "data": {
+        "label": "DynamoDB",
+        "service": "Amazon DynamoDB",
+        "description": "Stores user and tax data",
+        "estCost": "$30/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": 253.1037284509119,
+        "y": 400.27426074735973
+      },
+      "data": {
+        "label": "Lambda (Tax Processing)",
+        "service": "AWS Lambda",
+        "description": "Processes tax calculations and filings",
+        "estCost": "$15/month",
+        "faultTolerance": "Medium",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": 103.56525728109065,
+        "y": 401.20914907522615
+      },
+      "data": {
+        "label": "S3 (File Storage)",
+        "service": "Amazon S3",
+        "description": "Stores processed tax files and documents",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": 399.48107387415877,
+        "y": 402.4183324802257
+      },
+      "data": {
+        "label": "RDS (Tax Agency DB)",
+        "service": "Amazon RDS (PostgreSQL)",
+        "description": "Integrates with tax agency database for filing",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node8",
+      "type": "awsService",
+      "position": {
+        "x": 554.8593654633773,
+        "y": 402.2766852182171
+      },
+      "data": {
+        "label": "CloudWatch",
+        "service": "Amazon CloudWatch",
+        "description": "Monitors application logs, metrics, and errors",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node9",
+      "type": "awsService",
+      "position": {
+        "x": -346.84806992011636,
+        "y": 565.2396672072539
+      },
+      "data": {
+        "label": "Cognito",
+        "service": "Amazon Cognito",
+        "description": "Authenticates user requests",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node10",
+      "type": "awsService",
+      "position": {
+        "x": -49.621364627313085,
+        "y": 571.7696394159799
+      },
+      "data": {
+        "label": "Security Group (New)",
+        "service": "AWS Security Group",
+        "description": "Enforces network security for RDS and API Gateway",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Serves static assets and caches API responses",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node2",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Routes API requests to Lambda functions",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node3",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Reads/writes user and tax data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node3",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers tax processing functions",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node5",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Stores processed tax files and documents",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node5",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Integrates with tax agency database for filing",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node2",
+      "target": "node9",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Authenticates user requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge8",
+      "source": "node3",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Sends application logs and metrics",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge9",
+      "source": "node5",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Monitors tax processing errors and performance",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge10",
+      "source": "node10",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Restricts access to API Gateway",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge11",
+      "source": "node10",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Restricts access to RDS database",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Using AWS, Design a fully scalable webapp for a tax filer ai app, that uses user's data, tax information to fully design a tax file and file it.",
+    "rationale": "Generated using Cohere Command A (March 2025) - 9 services with 1 icons resolved",
+    "timestamp": "2025-07-08T03:16:44.032Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-07-08T03:21:14.083Z",
+    "lastEditedBy": "Claudio Chat",
+    "title": "Updated Tax Processing Architecture with Enhanced Security",
+    "description": "Added a new Security Group to enforce network security for API Gateway and RDS database.",
+    "estimatedCost": "$220/month",
+    "changes": "Added a new Security Group node and updated edges to reflect its integration with API Gateway and RDS.",
+    "lastModified": "2025-07-08T03:21:14.083Z",
+    "modificationHistory": [
+      {
+        "timestamp": "2025-07-08T03:20:22.380Z",
+        "request": "Add the security group",
+        "changes": "Added a Security Group node and connected it to API Gateway and RDS to enhance network security."
+      },
+      {
+        "timestamp": "2025-07-08T03:21:14.083Z",
+        "request": "add a security group into our solution",
+        "changes": "Added a new Security Group node and updated edges to reflect its integration with API Gateway and RDS."
+      }
+    ]
+  }
+}

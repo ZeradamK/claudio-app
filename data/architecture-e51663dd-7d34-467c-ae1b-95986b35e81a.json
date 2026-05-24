@@ -1,0 +1,339 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": -203.5378700623451,
+        "y": 402.70144152284644
+      },
+      "data": {
+        "label": "CloudFront",
+        "service": "Amazon CloudFront",
+        "description": "Content Delivery Network for serving static assets",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": 102.86929984202874,
+        "y": 403.75811925349177
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Manages and routes API requests",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/API-Gateway.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": 396.7606020175179,
+        "y": 403.6650372340986
+      },
+      "data": {
+        "label": "Application Load Balancer",
+        "service": "Application Load Balancer",
+        "description": "Distributes incoming traffic across EC2 instances",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/Application-Discovery-Service.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": -353.62788816969856,
+        "y": 399.2133433613273
+      },
+      "data": {
+        "label": "EC2 Auto Scaling Group",
+        "service": "Amazon EC2",
+        "description": "Scalable compute capacity for application logic",
+        "estCost": "$200/month",
+        "faultTolerance": "Medium",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": -204.42660895028507,
+        "y": 403.89064255594025
+      },
+      "data": {
+        "label": "RDS (PostgreSQL)",
+        "service": "Amazon RDS",
+        "description": "Managed relational database for product and order data",
+        "estCost": "$100/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": 97.66210396341836,
+        "y": 401.8273723566454
+      },
+      "data": {
+        "label": "DynamoDB",
+        "service": "Amazon DynamoDB",
+        "description": "NoSQL database for session and shopping cart management",
+        "estCost": "$30/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": 400.5030386429508,
+        "y": 403.6390614465843
+      },
+      "data": {
+        "label": "S3",
+        "service": "Amazon S3",
+        "description": "Object storage for images and static assets",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node8",
+      "type": "awsService",
+      "position": {
+        "x": -46.82483613256999,
+        "y": 399.4970637536562
+      },
+      "data": {
+        "label": "CloudWatch",
+        "service": "Amazon CloudWatch",
+        "description": "Monitoring and observability for EC2 instances",
+        "estCost": "$15/month",
+        "faultTolerance": "Medium",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node9",
+      "type": "awsService",
+      "position": {
+        "x": 254.15798459272312,
+        "y": 404.2695789976892
+      },
+      "data": {
+        "label": "Lambda",
+        "service": "AWS Lambda",
+        "description": "Serverless functions for image processing",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node10",
+      "type": "awsService",
+      "position": {
+        "x": 551.5745636050239,
+        "y": 403.0956477403665
+      },
+      "data": {
+        "label": "Security Group",
+        "service": "AWS Security Group",
+        "description": "Controls inbound and outbound traffic for EC2 instances",
+        "estCost": "$0/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Serves images from S3",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node2",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Routes API requests to EC2 instances",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node3",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Distributes traffic to EC2 instances",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node4",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Queries product and order data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node4",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Manages sessions and shopping carts",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node8",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Monitors EC2 instances",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node9",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Resizes and processes images",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge8",
+      "source": "node10",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Controls traffic to EC2 instances",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Using AWS, Design a well architected backend for e-commerce systems that use a lot of storage for retail images, and have high flow usage on the site",
+    "rationale": "Generated using Cohere Command A (March 2025) - 9 services with 2 icons resolved",
+    "timestamp": "2025-07-07T21:59:35.447Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-07-08T01:34:22.284Z",
+    "lastEditedBy": "Claudio Chat",
+    "title": "Updated E-Commerce Architecture with Security Group",
+    "description": "Added AWS Security Group to control inbound and outbound traffic for EC2 instances.",
+    "estimatedCost": "$455/month",
+    "changes": "Added a Security Group node and connected it to the EC2 Auto Scaling Group to enforce network security rules.",
+    "lastModified": "2025-07-08T01:34:22.283Z",
+    "modificationHistory": [
+      {
+        "timestamp": "2025-07-08T01:34:22.284Z",
+        "request": "can you add the security group config",
+        "changes": "Added a Security Group node and connected it to the EC2 Auto Scaling Group to enforce network security rules."
+      }
+    ]
+  }
+}
