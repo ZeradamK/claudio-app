@@ -1,0 +1,531 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": -51.49317781121519,
+        "y": 395.3552982635513
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Exposes secure RESTful APIs for banking operations",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Networking",
+        "details": {
+          "summary": "Amazon API Gateway service in the architecture",
+          "costEstimation": {
+            "monthly": {
+              "low": "Varies",
+              "medium": "Varies",
+              "high": "Varies"
+            },
+            "pricingNotes": "Cost depends on usage patterns"
+          },
+          "resilience": {
+            "scaling": "Auto-scaling available",
+            "failover": "Depends on configuration"
+          },
+          "security": {
+            "recommendations": [
+              "Follow AWS security best practices"
+            ]
+          },
+          "integration": {
+            "connectedTo": [],
+            "protocols": []
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(246, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": -53.39267316281889,
+        "y": 402.61825309708615
+      },
+      "data": {
+        "label": "Lambda - Transaction Processing",
+        "service": "AWS Lambda",
+        "description": "Processes transactions, validates data, and triggers workflows",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/Lambda.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Compute",
+        "details": {
+          "summary": "AWS Lambda service in the architecture",
+          "costEstimation": {
+            "monthly": {
+              "low": "Varies",
+              "medium": "Varies",
+              "high": "Varies"
+            },
+            "pricingNotes": "Cost depends on usage patterns"
+          },
+          "resilience": {
+            "scaling": "Auto-scaling available",
+            "failover": "Depends on configuration"
+          },
+          "security": {
+            "recommendations": [
+              "Follow AWS security best practices"
+            ]
+          },
+          "integration": {
+            "connectedTo": [],
+            "protocols": []
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(218, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": -197.89598539472374,
+        "y": 402.0299980285533
+      },
+      "data": {
+        "label": "DynamoDB - Transactions",
+        "service": "Amazon DynamoDB",
+        "description": "Stores transaction data with high throughput and low latency",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/DynamoDB.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Database",
+        "details": {
+          "summary": "Amazon DynamoDB service in the architecture",
+          "costEstimation": {
+            "monthly": {
+              "low": "Varies",
+              "medium": "Varies",
+              "high": "Varies"
+            },
+            "pricingNotes": "Cost depends on usage patterns"
+          },
+          "resilience": {
+            "scaling": "Auto-scaling available",
+            "failover": "Depends on configuration"
+          },
+          "security": {
+            "recommendations": [
+              "Follow AWS security best practices"
+            ]
+          },
+          "integration": {
+            "connectedTo": [],
+            "protocols": []
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(105, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": 101.83367688605766,
+        "y": 402.58754714965715
+      },
+      "data": {
+        "label": "RDS - Customer Data",
+        "service": "Amazon RDS (PostgreSQL)",
+        "description": "Stores sensitive customer data with encryption at rest",
+        "estCost": "$100/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Database",
+        "details": {
+          "summary": "Amazon RDS (PostgreSQL) service in the architecture",
+          "costEstimation": {
+            "monthly": {
+              "low": "Varies",
+              "medium": "Varies",
+              "high": "Varies"
+            },
+            "pricingNotes": "Cost depends on usage patterns"
+          },
+          "resilience": {
+            "scaling": "Auto-scaling available",
+            "failover": "Depends on configuration"
+          },
+          "security": {
+            "recommendations": [
+              "Follow AWS security best practices"
+            ]
+          },
+          "integration": {
+            "connectedTo": [],
+            "protocols": []
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(190, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": 251.26507973615767,
+        "y": 401.81658721002253
+      },
+      "data": {
+        "label": "Lambda - Fraud Detection",
+        "service": "AWS Lambda",
+        "description": "Analyzes transactions for fraudulent patterns using machine learning",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/Lambda.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Compute",
+        "details": {
+          "summary": "AWS Lambda service in the architecture",
+          "costEstimation": {
+            "monthly": {
+              "low": "Varies",
+              "medium": "Varies",
+              "high": "Varies"
+            },
+            "pricingNotes": "Cost depends on usage patterns"
+          },
+          "resilience": {
+            "scaling": "Auto-scaling available",
+            "failover": "Depends on configuration"
+          },
+          "security": {
+            "recommendations": [
+              "Follow AWS security best practices"
+            ]
+          },
+          "integration": {
+            "connectedTo": [],
+            "protocols": []
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(81, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": 252.54555679758516,
+        "y": 396.73480542265105
+      },
+      "data": {
+        "label": "CloudFront",
+        "service": "Amazon CloudFront",
+        "description": "Distributes static assets and APIs globally for low latency",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/CloudFront.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Networking",
+        "details": {
+          "summary": "Amazon CloudFront service in the architecture",
+          "costEstimation": {
+            "monthly": {
+              "low": "Varies",
+              "medium": "Varies",
+              "high": "Varies"
+            },
+            "pricingNotes": "Cost depends on usage patterns"
+          },
+          "resilience": {
+            "scaling": "Auto-scaling available",
+            "failover": "Depends on configuration"
+          },
+          "security": {
+            "recommendations": [
+              "Follow AWS security best practices"
+            ]
+          },
+          "integration": {
+            "connectedTo": [],
+            "protocols": []
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(313, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": 396.93047626017346,
+        "y": 397.00107953614645
+      },
+      "data": {
+        "label": "S3 - Backup",
+        "service": "Amazon S3",
+        "description": "Stores encrypted backups of transaction and customer data",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/S3.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Storage",
+        "details": {
+          "summary": "Amazon S3 service in the architecture",
+          "costEstimation": {
+            "monthly": {
+              "low": "Varies",
+              "medium": "Varies",
+              "high": "Varies"
+            },
+            "pricingNotes": "Cost depends on usage patterns"
+          },
+          "resilience": {
+            "scaling": "Auto-scaling available",
+            "failover": "Depends on configuration"
+          },
+          "security": {
+            "recommendations": [
+              "Follow AWS security best practices"
+            ]
+          },
+          "integration": {
+            "connectedTo": [],
+            "protocols": []
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(307, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node8",
+      "type": "awsService",
+      "position": {
+        "x": 104.57254405772412,
+        "y": 801.5642767317898
+      },
+      "data": {
+        "label": "KMS",
+        "service": "AWS Key Management Service",
+        "description": "Manages encryption keys for data at rest and in transit",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "security",
+        "icon": "/icons/aws-icons/KMS.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#FFEBEE",
+        "domain": "Security",
+        "details": {
+          "summary": "AWS Key Management Service service in the architecture",
+          "costEstimation": {
+            "monthly": {
+              "low": "Varies",
+              "medium": "Varies",
+              "high": "Varies"
+            },
+            "pricingNotes": "Cost depends on usage patterns"
+          },
+          "resilience": {
+            "scaling": "Auto-scaling available",
+            "failover": "Depends on configuration"
+          },
+          "security": {
+            "recommendations": [
+              "Follow AWS security best practices"
+            ]
+          },
+          "integration": {
+            "connectedTo": [],
+            "protocols": []
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(160, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers transaction processing Lambda function",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node2",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Writes transaction data to DynamoDB",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node2",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Updates customer balances in RDS",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node2",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Sends transactions for fraud analysis",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node1",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Distributes APIs globally via CloudFront",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node3",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Backs up transaction data to S3",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node4",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Backs up customer data to S3",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge8",
+      "source": "node3",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Encrypts data using KMS keys",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge9",
+      "source": "node4",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Encrypts data using KMS keys",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Using AWS, Design a serverless archtiecture for banking firms",
+    "rationale": "Generated using Cohere Command A (March 2025) - 8 services with 1 icons resolved",
+    "timestamp": "2025-07-06T01:33:37.658Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-07-06T01:33:37.659Z",
+    "lastEditedBy": "Generator"
+  }
+}

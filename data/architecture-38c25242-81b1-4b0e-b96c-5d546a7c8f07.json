@@ -1,0 +1,768 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": -46.84242914134383,
+        "y": 401.539462289804
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Exposes RESTful APIs for banking services with request throttling and authentication.",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Networking",
+        "details": {
+          "summary": "Amazon API Gateway is used to expose RESTful APIs for banking services, providing request throttling and authentication mechanisms. It acts as a front door for incoming requests, ensuring secure and controlled access to backend services.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$5/mo",
+              "medium": "$40/mo",
+              "high": "$200/mo"
+            },
+            "pricingNotes": "Cost is primarily based on the number of API calls, data transfer, and additional features like request throttling and authentication."
+          },
+          "resilience": {
+            "scaling": "API Gateway automatically scales to handle incoming request volumes, ensuring high availability.",
+            "failover": "It provides built-in failover mechanisms across multiple Availability Zones (AZs) for resilience."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const api = new apigateway.RestApi(this, 'BankingAPI', {\n  deployOptions: {\n    throttlingBurstLimit: 5000,\n    throttlingRateLimit: 10000,\n  },\n  defaultIntegration: new apigateway.HttpIntegration('http://your-backend-endpoint'),\n});\napi.addGatewayResponse('UNAUTHORIZED', { statusCode: '401' });"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\nclient = boto3.client('apigateway')\nresponse = client.create_rest_api(\n    name='BankingAPI',\n    endpointConfiguration={'types': ['REGIONAL']}\n)\nclient.update_stage(\n    restApiId=response['id'],\n    stageName='prod',\n    patchOperations=[{'op': 'replace', 'path': '/throttling/burstLimit', 'value': '5000'}]\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_api_gateway_rest_api\" \"banking_api\" {\n  name = \"BankingAPI\"\n  endpoint_configuration {\n    types = [\"REGIONAL\"]\n  }\n}\nresource \"aws_api_gateway_method_settings\" \"throttling\" {\n  rest_api_id = aws_api_gateway_rest_api.banking_api.id\n  stage_name = \"prod\"\n  method_path = \"*/*\"\n  settings {\n    throttling_burst_limit = 5000\n    throttling_rate_limit = 10000\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable AWS WAF integration for additional security against common web exploits.",
+              "Use IAM roles and policies to restrict API access based on user roles.",
+              "Implement OAuth2 or JWT-based authentication for secure client access.",
+              "Regularly monitor API Gateway logs and metrics for suspicious activities."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Application Load Balancer",
+              "AWS WAF"
+            ],
+            "protocols": [
+              "HTTPS",
+              "REST"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(111, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": -349.52014567351284,
+        "y": 395.5222703818996
+      },
+      "data": {
+        "label": "Application Load Balancer",
+        "service": "Application Load Balancer",
+        "description": "Distributes traffic across multiple application instances for high availability.",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Other",
+        "details": {
+          "summary": "The Application Load Balancer (ALB) distributes incoming traffic across multiple application instances to ensure high availability and fault tolerance. It routes requests from Amazon API Gateway to the appropriate targets, such as Amazon ECS services, based on configured rules. ALB supports HTTP/HTTPS protocols and provides advanced routing capabilities, including path-based and host-based routing.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$18/mo",
+              "medium": "$150/mo",
+              "high": "$400/mo"
+            },
+            "pricingNotes": "Costs are based on the number of Load Balancer Capacity Units (LCU) used, with each LCU representing a fixed amount of traffic. Additional charges apply for data processed and optional features like SSL/TLS termination."
+          },
+          "resilience": {
+            "scaling": "Automatically scales to handle traffic fluctuations, with support for both fixed and dynamic scaling policies.",
+            "failover": "Provides cross-zone load balancing to distribute traffic across multiple Availability Zones, ensuring failover in case of instance or AZ failures."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const alb = new elbv2.ApplicationLoadBalancer(this, 'ALB', {\n  vpc, \n  internetFacing: true\n});\nconst listener = alb.addListener('Listener', { port: 80 });\nlistener.addTargets('ECSTarget', {\n  port: 80,\n  targets: [ecsService]\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "client = boto3.client('elbv2')\nresponse = client.create_load_balancer(\n    Name='ALB',\n    Type='application',\n    Subnets=[subnet1, subnet2],\n    SecurityGroups=[sg_id]\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_lb\" \"alb\" {\n  name               = \"ALB\"\n  internal           = false\n  load_balancer_type = \"application\"\n  subnets            = [aws_subnet.public1.id, aws_subnet.public2.id]\n  security_groups    = [aws_security_group.alb_sg.id]\n}\nresource \"aws_lb_listener\" \"front_end\" {\n  load_balancer_arn = aws_lb.alb.arn\n  port              = \"80\"\n  protocol          = \"HTTP\"\n  default_action {\n    type             = \"forward\"\n    target_group_arn = aws_lb_target_group.ecs_tg.arn\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable HTTPS and use SSL/TLS certificates for secure communication.",
+              "Configure security groups to restrict inbound traffic to necessary IP ranges.",
+              "Implement Web Application Firewall (WAF) to protect against common web exploits.",
+              "Regularly rotate access logs and monitor for suspicious activity."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon API Gateway",
+              "Amazon ECS"
+            ],
+            "protocols": [
+              "HTTP",
+              "HTTPS"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(60, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": -53.7907342617963,
+        "y": 398.095217182255
+      },
+      "data": {
+        "label": "ECS Cluster",
+        "service": "Amazon ECS",
+        "description": "Manages Docker containers running microservices for core banking operations.",
+        "estCost": "$150/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/ECS.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Compute",
+        "details": {
+          "summary": "Amazon ECS (Elastic Container Service) is a fully managed container orchestration service that simplifies the deployment, management, and scaling of Docker containers. In this architecture, ECS manages microservices for core banking operations, ensuring high availability, scalability, and resilience. It integrates with other AWS services like Application Load Balancer, RDS for PostgreSQL, DynamoDB, S3, and CloudWatch to provide a robust and secure environment for running critical banking applications.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$50/mo",
+              "medium": "$300/mo",
+              "high": "$1,000/mo"
+            },
+            "pricingNotes": "Costs depend on the number of ECS tasks, CPU/memory usage, and storage. Low estimate assumes minimal usage, while high estimate accounts for scaling and heavy resource utilization."
+          },
+          "resilience": {
+            "scaling": "ECS supports auto-scaling based on CPU/memory usage or custom metrics, ensuring microservices can handle varying workloads.",
+            "failover": "Multi-AZ deployments and integration with Application Load Balancer provide failover capabilities, ensuring high availability during failures."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const ecsCluster = new ecs.Cluster(this, 'EcsCluster');\nconst taskDefinition = new ecs.FargateTaskDefinition(this, 'TaskDef');\ntaskDefinition.addContainer('BankingService', {\n  image: ecs.ContainerImage.fromRegistry('banking-microservice'),\n  memoryLimitMiB: 512,\n  cpu: 256,\n});\nconst service = new ecs.FargateService(this, 'EcsService', {\n  cluster: ecsCluster,\n  taskDefinition: taskDefinition,\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\necs = boto3.client('ecs')\nresponse = ecs.run_task(\n    cluster='BankingCluster',\n    taskDefinition='BankingTask',\n    launchType='FARGATE',\n    networkConfiguration={\n        'awsvpcConfiguration': {\n            'subnets': ['subnet-123456'],\n            'securityGroups': ['sg-123456'],\n        }\n    }\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_ecs_cluster\" \"banking_cluster\" {\n  name = \"BankingCluster\"\n}\nresource \"aws_ecs_task_definition\" \"banking_task\" {\n  family = \"BankingTask\"\n  container_definitions = <<EOF\n[\n    {\n      \"name\": \"BankingService\",\n      \"image\": \"banking-microservice\",\n      \"memory\": 512,\n      \"cpu\": 256\n    }\n  ]\nEOF\n}\nresource \"aws_ecs_service\" \"banking_service\" {\n  name = \"BankingService\"\n  cluster = aws_ecs_cluster.banking_cluster.id\n  task_definition = aws_ecs_task_definition.banking_task.arn\n  launch_type = \"FARGATE\"\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable IAM roles for ECS tasks to restrict permissions.",
+              "Use AWS Secrets Manager for managing sensitive data like database credentials.",
+              "Implement network isolation using security groups and private subnets.",
+              "Regularly scan container images for vulnerabilities using Amazon ECR or third-party tools.",
+              "Encrypt data at rest and in transit using AWS KMS and TLS."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Application Load Balancer",
+              "Amazon RDS for PostgreSQL",
+              "Amazon DynamoDB",
+              "Amazon S3",
+              "Amazon CloudWatch"
+            ],
+            "protocols": [
+              "HTTP/HTTPS",
+              "PostgreSQL",
+              "DynamoDB API",
+              "S3 API",
+              "CloudWatch Logs"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(28, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": -196.75694881566682,
+        "y": 399.28080552111345
+      },
+      "data": {
+        "label": "RDS PostgreSQL",
+        "service": "Amazon RDS for PostgreSQL",
+        "description": "Manages relational data for customer accounts, transactions, and history with multi-AZ deployment.",
+        "estCost": "$200/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Database",
+        "details": {
+          "summary": "Amazon RDS for PostgreSQL is a managed relational database service that provides high availability and durability for critical data. In this architecture, it serves as the primary data store for customer accounts, transactions, and history. The multi-AZ deployment ensures data replication across multiple Availability Zones for fault tolerance and reliability. RDS PostgreSQL integrates with Amazon ECS for application data access and AWS Key Management Service (KMS) for encryption at rest.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$50/mo",
+              "medium": "$200/mo",
+              "high": "$600/mo"
+            },
+            "pricingNotes": "Costs are based on instance type, storage size, and I/O operations. Low estimate assumes a db.t3.micro instance with 20GB storage. Medium estimate assumes a db.r5.large instance with 100GB storage. High estimate assumes a db.r5.xlarge instance with 500GB storage and high I/O usage."
+          },
+          "resilience": {
+            "scaling": "Vertical scaling by modifying the instance type. Read replicas can be added for read-heavy workloads.",
+            "failover": "Multi-AZ deployment provides automatic failover to a standby instance in a different Availability Zone."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const database = new rds.DatabaseInstance(this, 'CustomerDB', {\n  engine: rds.DatabaseInstanceEngine.postgres({ version: '13.3' }),\n  instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO),\n  multiAz: true,\n  allocatedStorage: 20,\n  vpc: vpc,\n  credentials: {\n    username: 'admin',\n    password: 'yourpassword'\n  }\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "response = client.create_db_instance(\n    DBInstanceIdentifier='customer-db',\n    Engine='postgres',\n    DBInstanceClass='db.t3.micro',\n    MultiAZ=True,\n    AllocatedStorage=20,\n    MasterUsername='admin',\n    MasterUserPassword='yourpassword'\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_db_instance\" \"customer_db\" {\n  identifier           = \"customer-db\"\n  engine               = \"postgres\"\n  instance_class       = \"db.t3.micro\"\n  multi_az             = true\n  allocated_storage    = 20\n  username             = \"admin\"\n  password             = \"yourpassword\"\n  skip_final_snapshot  = true\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable encryption at rest using AWS KMS.",
+              "Implement IAM authentication for database access.",
+              "Restrict access using security groups and VPC endpoints.",
+              "Regularly rotate credentials and audit database access logs.",
+              "Enable automated backups and point-in-time recovery."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon ECS",
+              "AWS Key Management Service"
+            ],
+            "protocols": [
+              "PostgreSQL Wire Protocol",
+              "HTTPS (for KMS integration)"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(167, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": 96.03601651308018,
+        "y": 396.15145256002734
+      },
+      "data": {
+        "label": "DynamoDB",
+        "service": "Amazon DynamoDB",
+        "description": "Stores session data and temporary transaction records for low-latency access.",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/DynamoDB.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Database",
+        "details": {
+          "summary": "Amazon DynamoDB is a fully managed NoSQL database service that provides fast and predictable performance with seamless scalability. In this architecture, DynamoDB is used to store session data and temporary transaction records, ensuring low-latency access for the connected Amazon ECS services.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$25/mo",
+              "medium": "$150/mo",
+              "high": "$400/mo"
+            },
+            "pricingNotes": "DynamoDB costs are based on provisioned capacity (RCU/WCU) or on-demand capacity mode. The estimate assumes a mix of read/write operations with moderate throughput. Costs can vary significantly based on the amount of data stored and the number of requests."
+          },
+          "resilience": {
+            "scaling": "DynamoDB automatically scales based on provisioned capacity or on-demand settings. For high-traffic scenarios, consider using DynamoDB Auto Scaling to adjust capacity dynamically.",
+            "failover": "DynamoDB replicates data across multiple Availability Zones within a region, providing built-in fault tolerance and high availability."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const table = new dynamodb.Table(this, 'SessionTable', {\n  tableName: 'SessionData',\n  partitionKey: { name: 'SessionId', type: dynamodb.AttributeType.STRING },\n  billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,\n  removalPolicy: cdk.RemovalPolicy.DESTROY,\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\ndynamodb = boto3.resource('dynamodb')\ntable = dynamodb.create_table(\n    TableName='SessionData',\n    KeySchema=[{'AttributeName': 'SessionId', 'KeyType': 'HASH'}],\n    AttributeDefinitions=[{'AttributeName': 'SessionId', 'AttributeType': 'S'}],\n    BillingMode='PAY_PER_REQUEST'\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_dynamodb_table\" \"session_table\" {\n  name           = \"SessionData\"\n  hash_key       = \"SessionId\"\n  billing_mode   = \"PAY_PER_REQUEST\"\n  attribute {\n    name = \"SessionId\"\n    type = \"S\"\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable encryption at rest using AWS Key Management Service (KMS).",
+              "Use IAM policies to restrict access to DynamoDB tables based on the principle of least privilege.",
+              "Enable DynamoDB Streams with Point-in-Time Recovery for data resilience.",
+              "Monitor access patterns and API calls using AWS CloudTrail."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon ECS"
+            ],
+            "protocols": [
+              "HTTPS",
+              "AWS SDK"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(179, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": 401.970663916099,
+        "y": 396.8623656064617
+      },
+      "data": {
+        "label": "S3",
+        "service": "Amazon S3",
+        "description": "Stores encrypted customer documents and transaction receipts with versioning enabled.",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/S3.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Storage",
+        "details": {
+          "summary": "Amazon S3 is used to securely store encrypted customer documents and transaction receipts. Versioning is enabled to maintain a history of changes, ensuring data integrity and recoverability. It integrates with Amazon ECS for data uploads and AWS KMS for encryption key management.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$5/mo",
+              "medium": "$50/mo",
+              "high": "$200/mo"
+            },
+            "pricingNotes": "Costs depend on storage usage, data transfer, and request frequency. Encryption and versioning incur minimal additional charges."
+          },
+          "resilience": {
+            "scaling": "S3 automatically scales to handle any storage or request volume.",
+            "failover": "Data is redundantly stored across multiple Availability Zones for high durability."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const bucket = new s3.Bucket(this, 'EncryptedDocumentsBucket', {\n  versioned: true,\n  encryption: s3.BucketEncryption.KMS,\n  encryptionKey: kmsKey,\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "s3 = boto3.client('s3')\ns3.create_bucket(Bucket='encrypted-documents', ObjectOwnership='BucketOwnerEnforced')\ns3.put_bucket_versioning(Bucket='encrypted-documents', VersioningConfiguration={'Status': 'Enabled'})"
+          },
+          "terraform": {
+            "code": "resource \"aws_s3_bucket\" \"encrypted_documents\" {\n  bucket = \"encrypted-documents\"\n  versioning {\n    enabled = true\n  }\n  server_side_encryption_configuration {\n    rule {\n      apply_server_side_encryption_by_default {\n        kms_master_key_id = aws_kms_key.encryption_key.arn\n        sse_algorithm = \"aws:kms\"\n      }\n    }\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable bucket access logging for audit trails.",
+              "Use IAM policies to restrict access to specific users/roles.",
+              "Regularly rotate KMS encryption keys.",
+              "Enable S3 Object Lock for compliance and WORM (Write Once Read Many) use cases."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon ECS",
+              "AWS Key Management Service"
+            ],
+            "protocols": [
+              "HTTPS",
+              "SDK"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(95, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": 246.63922155350988,
+        "y": 403.6311410119918
+      },
+      "data": {
+        "label": "CloudWatch",
+        "service": "Amazon CloudWatch",
+        "description": "Monitors application performance, logs, and triggers alarms for critical events.",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/CloudWatch.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Management",
+        "details": {
+          "summary": "Amazon CloudWatch is a monitoring and observability service that tracks application performance, collects and analyzes logs, and sets alarms for critical events. In this architecture, it monitors Amazon ECS, providing insights into container performance, resource utilization, and application health. CloudWatch can trigger automated responses or notify operators when predefined thresholds are breached.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$5/mo",
+              "medium": "$50/mo",
+              "high": "$200/mo"
+            },
+            "pricingNotes": "Costs are primarily based on the number of metrics monitored, logs ingested, and alarms set. Basic monitoring of a few ECS tasks with minimal logging would be on the lower end. Extensive monitoring with detailed logging, custom metrics, and numerous alarms would incur higher costs."
+          },
+          "resilience": {
+            "scaling": "CloudWatch itself is a managed service and scales automatically to handle the monitoring load. It integrates with ECS auto-scaling policies to adjust resource allocation based on metrics like CPU and memory usage.",
+            "failover": "CloudWatch operates across multiple Availability Zones within a region, ensuring high availability and reliability. Data is automatically replicated, and alarms can trigger across different regions for disaster recovery scenarios."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const cloudwatchAlarm = new cloudwatch.Alarm(this, 'ECSCPUAlarm', {\n  metric: new cloudwatch.Metric({\n    namespace: 'AWS/ECS',\n    metricName: 'CPUUtilization',\n    dimensions: { ClusterName: 'YourClusterName' },\n  }),\n  threshold: 70,\n  evaluationPeriods: 2,\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\ncloudwatch = boto3.client('cloudwatch')\nresponse = cloudwatch.put_metric_alarm(\n    AlarmName='ECSCPUAlarm',\n    MetricName='CPUUtilization',\n    Namespace='AWS/ECS',\n    Statistic='Average',\n    Period=60,\n    EvaluationPeriods=2,\n    Threshold=70,\n    ComparisonOperator='GreaterThanThreshold',\n)\n"
+          },
+          "terraform": {
+            "code": "resource \"aws_cloudwatch_metric_alarm\" \"ecs_cpu_alarm\" {\n  alarm_name          = \"ECSCPUAlarm\"\n  comparison_operator = \"GreaterThanThreshold\"\n  evaluation_periods  = \"2\"\n  metric_name         = \"CPUUtilization\"\n  namespace           = \"AWS/ECS\"\n  period              = \"60\"\n  statistic           = \"Average\"\n  threshold           = \"70\"\n  treat_missing_data  = \"breaching\"\n}\n"
+          },
+          "security": {
+            "recommendations": [
+              "Ensure CloudWatch logs are encrypted at rest using AWS KMS.",
+              "Apply IAM policies to restrict access to sensitive metrics and logs.",
+              "Enable CloudWatch alarms for security-related events like unauthorized access attempts.",
+              "Regularly audit CloudWatch metrics and logs for unusual activity patterns."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon ECS"
+            ],
+            "protocols": [
+              "HTTPS",
+              "AWS SDK"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(252, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node8",
+      "type": "awsService",
+      "position": {
+        "x": 550.3454500335702,
+        "y": 398.96656655549316
+      },
+      "data": {
+        "label": "KMS",
+        "service": "AWS Key Management Service",
+        "description": "Manages encryption keys for data at rest and in transit.",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/KMS.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Security",
+        "details": {
+          "summary": "AWS Key Management Service (KMS) is a managed service that provides encryption key management for data at rest and in transit. In this architecture, KMS is used to manage encryption keys for Amazon RDS for PostgreSQL and Amazon S3. It ensures secure storage and access to encryption keys, allowing for centralized control and auditing of key usage.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$10/mo",
+              "medium": "$80/mo",
+              "high": "$250/mo"
+            },
+            "pricingNotes": "KMS pricing is based on the number of keys, API requests, and optional features like custom key stores. The estimated monthly cost ranges from $10 for low usage (few keys and requests) to $250 for high usage (many keys, frequent requests, and advanced features)."
+          },
+          "resilience": {
+            "scaling": "KMS automatically scales to handle API requests, ensuring consistent performance even under high load.",
+            "failover": "KMS is a regional service with built-in redundancy, ensuring high availability and failover within the same region."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const kmsKey = new kms.Key(this, 'EncryptionKey', {\n  enableKeyRotation: true,\n  description: 'Encryption key for RDS and S3',\n});\n\n// Grant RDS and S3 access to the KMS key\nconst rdsInstance = new rds.DatabaseInstance(...);\nrdsInstance.grantConnect(kmsKey);\n\nconst s3Bucket = new s3.Bucket(...);\ns3Bucket.grantReadWrite(kmsKey);\n"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\nkms_client = boto3.client('kms')\n\n# Create a KMS key\nkey = kms_client.create_key(\n    Description='Encryption key for RDS and S3',\n    KeyUsage='ENCRYPT_DECRYPT',\n)\n\nkey_id = key['KeyMetadata']['KeyId']\nprint(f'KMS Key created with ID: {key_id}')\n"
+          },
+          "terraform": {
+            "code": "resource \"aws_kms_key\" \"encryption_key\" {\n  description             = \"Encryption key for RDS and S3\"\n  deletion_window_in_days = 30\n  enable_key_rotation     = true\n}\n\nresource \"aws_kms_alias\" \"encryption_key_alias\" {\n  name          = \"alias/rds-s3-encryption-key\"\n  target_key_id = aws_kms_key.encryption_key.key_id\n}\n"
+          },
+          "security": {
+            "recommendations": [
+              "Enable automatic key rotation for all KMS keys to ensure regular updating of encryption keys.",
+              "Apply strict IAM policies to control access to KMS keys, limiting permissions to only necessary services and users.",
+              "Monitor KMS key usage with AWS CloudTrail to detect and respond to unusual activity.",
+              "Use AWS KMS multi-region keys for disaster recovery and cross-region replication scenarios."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon RDS for PostgreSQL",
+              "Amazon S3"
+            ],
+            "protocols": [
+              "HTTPS",
+              "AWS SDK"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(286, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node9",
+      "type": "awsService",
+      "position": {
+        "x": 248.91189162372407,
+        "y": 401.26311434931245
+      },
+      "data": {
+        "label": "WAF",
+        "service": "AWS WAF",
+        "description": "Protects web applications from common web exploits and bots.",
+        "estCost": "$60/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/WAF.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Security",
+        "details": {
+          "summary": "AWS WAF is a web application firewall that helps protect web applications from common web exploits and bots. It allows you to configure rules to block or allow traffic based on IP addresses, HTTP headers, and other criteria. In this architecture, AWS WAF is integrated with Amazon API Gateway to protect the APIs from malicious traffic and ensure only legitimate requests reach the backend services.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$10/mo",
+              "medium": "$80/mo",
+              "high": "$250/mo"
+            },
+            "pricingNotes": "AWS WAF pricing is based on the number of web ACLs, rules, and requests processed. The low estimate assumes minimal usage with a few rules and low traffic. The medium estimate accounts for moderate usage with multiple rules and higher traffic. The high estimate is for heavy usage with complex rule sets and high traffic volumes."
+          },
+          "resilience": {
+            "scaling": "AWS WAF automatically scales to handle the volume of traffic and applies rules consistently across all requests.",
+            "failover": "AWS WAF operates at the edge locations of the AWS network, providing low latency and high availability. It does not require additional failover configuration as it is a fully managed service."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const waf = new waf.CfnWebACL(\n  scope, 'MyWAF',\n  {\n    defaultAction: {\n      allow: {}\n    },\n    rules: [\n      {\n        priority: 1,\n        ruleId: 'Rule1',\n        action: {\n          block: {}\n        },\n        statement: {\n          ipSetReferenceStatement: {\n            arn: 'arn:aws:wafv2:us-east-1:123456789012:ipset/example'\n          }\n        }\n      }\n    ],\n    scope: 'REGIONAL',\n    visibilityConfig: {\n      cloudWatchMetricsEnabled: true,\n      metricName: 'MyWAFMetric',\n      sampledRequestsEnabled: true\n    }\n  }\n);\n\nconst apiGateway = new apigateway.RestApi(scope, 'MyApi');\nnew waf.CfnWebACLAssociation(\n  scope, 'WAFAssociation',\n  {\n    resourceArn: apiGateway.arn,\n    webAclArn: waf.attrArn\n  }\n);"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\nclient = boto3.client('wafv2')\n\nresponse = client.create_web_acl(\n    Name='MyWAF',\n    Scope='REGIONAL',\n    DefaultAction={'Allow': {}},\n    Rules=[\n        {\n            'Name': 'BlockIPRule',\n            'Priority': 1,\n            'Statement': {\n                'IPSetReferenceStatement': {\n                    'ARN': 'arn:aws:wafv2:us-east-1:123456789012:ipset/example'\n                }\n            },\n            'Action': {'Block': {}},\n            'VisibilityConfig': {\n                'CloudWatchMetricsEnabled': True,\n                'MetricName': 'MyWAFMetric',\n                'SampledRequestsEnabled': True\n            }\n        }\n    ],\n    VisibilityConfig={\n        'CloudWatchMetricsEnabled': True,\n        'MetricName': 'MyWAFMetric',\n        'SampledRequestsEnabled': True\n    }\n)\n\napi_gateway_client = boto3.client('apigateway')\napi_response = api_gateway_client.create_rest_api(Name='MyApi')\n\nclient.associate_web_acl(\n    WebACLArn=response['Summary']['ARN'],\n    ResourceArn=api_response['id']\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_wafv2_web_acl\" \"my_waf\" {\n  name        = \"MyWAF\"\n  scope       = \"REGIONAL\"\n  default_action {\n    allow {}\n  }\n  rule {\n    name     = \"BlockIPRule\"\n    priority = 1\n    action {\n      block {}\n    }\n    statement {\n      ip_set_reference_statement {\n        arn = aws_wafv2_ip_set.example.arn\n      }\n    }\n    visibility_config {\n      cloudwatch_metrics_enabled = true\n      metric_name                = \"MyWAFMetric\"\n      sampled_requests_enabled   = true\n    }\n  }\n  visibility_config {\n    cloudwatch_metrics_enabled = true\n    metric_name                = \"MyWAFMetric\"\n    sampled_requests_enabled   = true\n  }\n}\n\nresource \"aws_wafv2_web_acl_association\" \"waf_association\" {\n  resource_arn = aws_api_gateway_rest_api.my_api.arn\n  web_acl_arn  = aws_wafv2_web_acl.my_waf.arn\n}\n\nresource \"aws_api_gateway_rest_api\" \"my_api\" {\n  name = \"MyApi\"\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Regularly update and manage IP sets to block known malicious IPs.",
+              "Use AWS Managed Rules for AWS WAF to protect against common exploits like SQL injection and cross-site scripting (XSS).",
+              "Enable AWS WAF logging to Amazon CloudWatch for monitoring and analysis of traffic patterns.",
+              "Implement rate-based rules to mitigate DDoS attacks by limiting the number of requests from a single IP address.",
+              "Ensure proper integration with AWS Shield for additional DDoS protection."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon API Gateway"
+            ],
+            "protocols": [
+              "HTTP",
+              "HTTPS"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(66, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Routes API requests to load balancer",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node2",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Distributes traffic to ECS tasks",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node3",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Accesses customer and transaction data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node3",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Stores session and temporary data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node3",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Stores encrypted documents",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node7",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Monitors application performance and logs",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node8",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Encrypts database data at rest",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge8",
+      "source": "node8",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Encrypts S3 objects",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge9",
+      "source": "node9",
+      "target": "node1",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Protects API Gateway from web attacks",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Using AWS, Design a well architected backend for banking services.",
+    "rationale": "Generated using Cohere Command A (March 2025) - 9 services with 2 icons resolved",
+    "timestamp": "2025-07-08T18:49:28.784Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-07-08T18:49:28.784Z",
+    "lastEditedBy": "Generator"
+  }
+}

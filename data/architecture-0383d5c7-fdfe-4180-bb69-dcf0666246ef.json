@@ -1,0 +1,724 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": -48.4297513312505,
+        "y": 400.5800406477999
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Handles incoming API requests",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/API-Gateway.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node9",
+      "type": "awsService",
+      "position": {
+        "x": 249.87461489686717,
+        "y": 399.62608518309753
+      },
+      "data": {
+        "label": "Application Load Balancer",
+        "service": "Elastic Load Balancing",
+        "description": "Distributes incoming traffic",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/ElastiCache.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": -348.0436435681817,
+        "y": 402.531847975487
+      },
+      "data": {
+        "label": "Lambda - Auth",
+        "service": "AWS Lambda",
+        "description": "Handles authentication logic",
+        "estCost": "$10/month",
+        "faultTolerance": "Medium",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": -52.0264193469117,
+        "y": 395.9993095200165
+      },
+      "data": {
+        "label": "Lambda - Transactions",
+        "service": "AWS Lambda",
+        "description": "Processes transaction requests",
+        "estCost": "$15/month",
+        "faultTolerance": "Medium",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node13",
+      "type": "awsService",
+      "position": {
+        "x": 250.87296934717457,
+        "y": 395.34453931784316
+      },
+      "data": {
+        "label": "Amazon ECS",
+        "service": "Amazon ECS",
+        "description": "Manages containerized applications",
+        "estCost": "$30/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node14",
+      "type": "awsService",
+      "position": {
+        "x": 546.8362148922722,
+        "y": 398.0525832341905
+      },
+      "data": {
+        "label": "ECS Service - Auth",
+        "service": "Amazon ECS Service",
+        "description": "Auth service running on ECS",
+        "estCost": "$20/month",
+        "faultTolerance": "Medium",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node15",
+      "type": "awsService",
+      "position": {
+        "x": -348.3285453359984,
+        "y": 565.5216263686741
+      },
+      "data": {
+        "label": "ECS Service - Transactions",
+        "service": "Amazon ECS Service",
+        "description": "Transaction service running on ECS",
+        "estCost": "$25/month",
+        "faultTolerance": "Medium",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node10",
+      "type": "awsService",
+      "position": {
+        "x": -346.4527553442185,
+        "y": 398.63212054330944
+      },
+      "data": {
+        "label": "DynamoDB Accelerator (DAX)",
+        "service": "Amazon DAX",
+        "description": "Caches DynamoDB data for low-latency access",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": -45.33201283913385,
+        "y": 396.5018958460484
+      },
+      "data": {
+        "label": "DynamoDB - Accounts",
+        "service": "Amazon DynamoDB",
+        "description": "Stores account information",
+        "estCost": "$30/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": 253.936348209243,
+        "y": 401.1626939450098
+      },
+      "data": {
+        "label": "DynamoDB - Transactions",
+        "service": "Amazon DynamoDB",
+        "description": "Stores transaction history",
+        "estCost": "$40/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": 554.7295838598328,
+        "y": 402.3635361730976
+      },
+      "data": {
+        "label": "S3 - Backups",
+        "service": "Amazon S3",
+        "description": "Stores backups of DynamoDB data",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node16",
+      "type": "awsService",
+      "position": {
+        "x": -349.3383397656358,
+        "y": 566.9951917202397
+      },
+      "data": {
+        "label": "S3 - Data Lake",
+        "service": "Amazon S3",
+        "description": "Stores raw data for analytics",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node17",
+      "type": "awsService",
+      "position": {
+        "x": -51.714550294124884,
+        "y": 572.5218291931203
+      },
+      "data": {
+        "label": "AWS Glue",
+        "service": "AWS Glue",
+        "description": "Prepares and catalogs data for analytics",
+        "estCost": "$40/month",
+        "faultTolerance": "Medium",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node18",
+      "type": "awsService",
+      "position": {
+        "x": 246.1880082403783,
+        "y": 568.4727984946504
+      },
+      "data": {
+        "label": "Amazon Athena",
+        "service": "Amazon Athena",
+        "description": "Performs SQL queries on data in S3",
+        "estCost": "$30/month",
+        "faultTolerance": "Medium",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": -51.85832966636458,
+        "y": 565.4468763059907
+      },
+      "data": {
+        "label": "CloudWatch",
+        "service": "Amazon CloudWatch",
+        "description": "Monitors application and infrastructure metrics",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node8",
+      "type": "awsService",
+      "position": {
+        "x": 246.25840006008326,
+        "y": 565.8185151205457
+      },
+      "data": {
+        "label": "KMS",
+        "service": "AWS Key Management Service",
+        "description": "Manages encryption keys",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node11",
+      "type": "awsService",
+      "position": {
+        "x": 547.9790991195657,
+        "y": 568.536256561946
+      },
+      "data": {
+        "label": "Auto Scaling Group",
+        "service": "AWS Auto Scaling",
+        "description": "Scales ECS services based on demand",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node12",
+      "type": "awsService",
+      "position": {
+        "x": -345.6375658818926,
+        "y": 735.9874828738492
+      },
+      "data": {
+        "label": "CloudWatch Alarms",
+        "service": "Amazon CloudWatch Alarms",
+        "description": "Triggers scaling actions based on metrics",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node9",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Routes requests to ALB",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node9",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Distributes auth requests to Lambda",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node9",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Distributes transaction requests to Lambda",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node9",
+      "target": "node13",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Routes requests to ECS",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node13",
+      "target": "node14",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Scales auth service",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node13",
+      "target": "node15",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Scales transaction service",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node2",
+      "target": "node10",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Retrieves account details from DAX",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge8",
+      "source": "node3",
+      "target": "node10",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Reads account balances from DAX",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge9",
+      "source": "node10",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Fetches data from DynamoDB - Accounts",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge10",
+      "source": "node3",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Records transaction history",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge11",
+      "source": "node4",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Backs up account data to S3",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge12",
+      "source": "node5",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Backs up transaction data to S3",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge13",
+      "source": "node1",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Sends API metrics to CloudWatch",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge14",
+      "source": "node2",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Sends Lambda metrics to CloudWatch",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge15",
+      "source": "node3",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Sends Lambda metrics to CloudWatch",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge16",
+      "source": "node4",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Encrypts account data with KMS keys",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge17",
+      "source": "node5",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Encrypts transaction data with KMS keys",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge18",
+      "source": "node7",
+      "target": "node12",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers scaling alarms based on metrics",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge19",
+      "source": "node12",
+      "target": "node11",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Scales ECS services and DynamoDB capacity",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge20",
+      "source": "node4",
+      "target": "node16",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Exports account data to S3 Data Lake",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge21",
+      "source": "node5",
+      "target": "node16",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Exports transaction data to S3 Data Lake",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge22",
+      "source": "node16",
+      "target": "node17",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Prepares and catalogs data with Glue",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge23",
+      "source": "node17",
+      "target": "node18",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Enables SQL queries with Athena",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Using AWS, Design a serverless architecture for banking systems",
+    "rationale": "Generated using Cohere Command A (March 2025) - 8 services with 1 icons resolved",
+    "timestamp": "2025-06-03T01:05:37.450Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-06-03T04:35:07.399Z",
+    "lastEditedBy": "Claudio Chat",
+    "title": "Updated Architecture with Data Lake",
+    "description": "Added a data lake using S3, Glue, and Athena for analytics.",
+    "estimatedCost": "$420/month",
+    "changes": "Added S3 for data lake storage, AWS Glue for data preparation, and Amazon Athena for SQL querying. New edges show data flow from DynamoDB to S3, and integration with Glue and Athena.",
+    "lastModified": "2025-06-03T04:35:07.399Z",
+    "modificationHistory": [
+      {
+        "timestamp": "2025-06-03T01:07:01.891Z",
+        "request": "What is the best way to scale my web app?",
+        "changes": "Added Application Load Balancer for traffic distribution, introduced DynamoDB Accelerator (DAX) for caching, and adjusted service positions for better visualization. These changes improve scalability, reduce latency, and enhance fault tolerance."
+      },
+      {
+        "timestamp": "2025-06-03T01:07:42.834Z",
+        "request": "what is the best way to scale my web app describe to me",
+        "changes": "Added AWS Auto Scaling and CloudWatch Alarms to dynamically scale Lambda functions and DynamoDB capacity based on demand. This ensures the application can handle increased traffic and load efficiently."
+      },
+      {
+        "timestamp": "2025-06-03T01:15:26.192Z",
+        "request": "What is the best way to scale my web app?",
+        "changes": "Added Amazon ECS and ECS services for auth and transactions. Updated auto-scaling to manage ECS services alongside Lambda and DynamoDB."
+      },
+      {
+        "timestamp": "2025-06-03T04:35:07.399Z",
+        "request": "Add a data lake using S3, Glue, and Athena for analytics",
+        "changes": "Added S3 for data lake storage, AWS Glue for data preparation, and Amazon Athena for SQL querying. New edges show data flow from DynamoDB to S3, and integration with Glue and Athena."
+      }
+    ]
+  }
+}

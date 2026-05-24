@@ -1,0 +1,688 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": -52.15477360135573,
+        "y": 400.82491765617146
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Exposes RESTful APIs for banking services",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Networking",
+        "details": {
+          "summary": "Amazon API Gateway is a fully managed service that makes it easy for developers to create, publish, maintain, monitor, and secure APIs at any scale. In this architecture, API Gateway exposes RESTful APIs for banking services, acting as the front door for incoming API requests. It handles request routing, authentication, and rate limiting, ensuring secure and efficient access to backend services.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$5/mo",
+              "medium": "$40/mo",
+              "high": "$200/mo"
+            },
+            "pricingNotes": "Costs are based on the number of API calls, data transfer, and optional features like request/response transformations. The low estimate assumes minimal usage, while the high estimate reflects heavy traffic and additional features."
+          },
+          "resilience": {
+            "scaling": "API Gateway automatically scales to handle incoming request volumes, ensuring high availability.",
+            "failover": "It provides built-in fault tolerance and integrates with AWS Regions for disaster recovery."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const api = new apigateway.RestApi(this, 'BankingAPI', {\n  description: 'Exposes RESTful APIs for banking services',\n  deployOptions: {\n    stageName: 'prod',\n    throttlingRateLimit: 100,\n    throttlingBurstLimit: 200,\n  },\n});\napi.root.addMethod('ANY');\nconst integration = new apigateway.LambdaIntegration(bankingLambda);\napi.root.addResource('transactions').addMethod('GET', integration);"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\nclient = boto3.client('apigateway')\nresponse = client.create_rest_api(\n    name='BankingAPI',\n    description='Exposes RESTful APIs for banking services'\n)\nclient.create_resource(\n    restApiId=response['id'],\n    parentId=response['rootResourceId'],\n    pathPart='transactions'\n)\nclient.put_method(\n    restApiId=response['id'],\n    resourceId=response['rootResourceId'],\n    httpMethod='GET',\n    authorizationType='AWS_IAM'\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_api_gateway_rest_api\" \"banking_api\" {\n  name        = \"BankingAPI\"\n  description = \"Exposes RESTful APIs for banking services\"\n}\nresource \"aws_api_gateway_resource\" \"transactions\" {\n  rest_api_id = aws_api_gateway_rest_api.banking_api.id\n  parent_id   = aws_api_gateway_rest_api.banking_api.root_resource_id\n  path_part   = \"transactions\"\n}\nresource \"aws_api_gateway_method\" \"get_transactions\" {\n  rest_api_id   = aws_api_gateway_rest_api.banking_api.id\n  resource_id   = aws_api_gateway_resource.transactions.id\n  http_method   = \"GET\"\n  authorization = \"AWS_IAM\"\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable AWS WAF to protect against common web exploits.",
+              "Use IAM roles and policies for fine-grained access control.",
+              "Encrypt data in transit using TLS 1.2 or higher.",
+              "Implement API keys and usage plans for client-side throttling.",
+              "Integrate with Amazon Cognito for user authentication and authorization."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "AWS Lambda",
+              "Amazon Cognito",
+              "AWS Key Management Service"
+            ],
+            "protocols": [
+              "HTTPS",
+              "REST"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(206, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": -52.18648483135226,
+        "y": 398.009740785133
+      },
+      "data": {
+        "label": "Lambda - Account Service",
+        "service": "AWS Lambda",
+        "description": "Handles account creation, retrieval, and updates",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/Lambda.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Compute",
+        "details": {
+          "summary": "This node is an AWS Lambda function that handles account creation, retrieval, and updates. It is connected to Amazon API Gateway, Amazon DynamoDB, and Amazon CloudWatch, and uses these services to perform its tasks.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$10/mo",
+              "medium": "$80/mo",
+              "high": "$250/mo"
+            },
+            "pricingNotes": "AWS Lambda uses a pay-as-you-use model, with costs based on usage and duration of computing. There is a free tier offering 1 million invocations and 3.2M seconds of compute time per month. After that, it costs $0.0000002 per invocation and about $0.0000166667 for every Gb/s of compute time."
+          },
+          "resilience": {
+            "scaling": "AWS Lambda automatically scales to handle increased load, launching additional instances as needed. It can automatically scale to meet sudden spikes in demand, ensuring continuous service without interruptions.",
+            "failover": "AWS Lambda automatically retries failed invocations, ensuring functions are executed even in the face of temporary issues."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "import * as cdk from 'aws-cdk-lib';\nimport { Construct } from 'constructs';\nimport * as lambda from 'aws-cdk-lib/aws-lambda';\n\nexport class LambdaStack extends cdk.Stack {\n  constructor(scope: Construct, id: string, props?: cdk.StackProps) {\n    super(scope, id, props);\n\n    // Define a new Lambda function\n    const lambdaFunction = new lambda.Function(this, 'AccountHandler', {\n      runtime: lambda.Runtime.NODEJS_14_X,\n      handler: 'index.handler',\n      code: lambda.Code.fromAsset('lambda'),\n    });\n  }\n}"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\n# Create a Lambda client\nclient = boto3.client('lambda')\n\n# Define the function\ndef lambda_handler(event, context):\n    # Handle account operations here\n    return {\n        'statusCode': 200,\n        'body': 'Account operation successful'\n    }\n\n# Upload the function to Lambda\nresponse = client.create_function(\n    FunctionName='AccountHandler',\n    Runtime='python3.8',\n    Role='your-iam-role',\n    Handler='lambda_function.lambda_handler',\n    Code={'ZipFile': open('lambda_function.zip', 'rb').read()}\n)"
+          },
+          "terraform": {
+            "code": "provider \"aws\" {\n  region = \"us-east-1\"\n}\n\nresource \"aws_lambda_function\" \"account_handler\" {\n  function_name = \"AccountHandler\"\n  role          = \"your-iam-role\"\n  handler       = \"index.handler\"\n  runtime       = \"nodejs14.x\"\n  filename      = \"lambda.zip\"\n}\n\nresource \"aws_iam_role\" \"lambda_role\" {\n  name = \"lambda_role\"\n\n  assume_role_policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [\n      {\n        Action = \"sts:AssumeRole\"\n        Effect = \"Allow\"\n        Principal = {\n          Service = \"lambda.amazonaws.com\"\n        }\n      }\n    ]\n  })\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Use AWS Identity and Access Management (IAM) to restrict access to Lambda functions with the principle of least privilege.",
+              "Encrypt data at rest and in transit.",
+              "Monitor Lambda network activity logs using Amazon GuardDuty to identify potential security threats.",
+              "Use AWS Inspector or third-party tools to scan Lambda functions for vulnerabilities.",
+              "Store sensitive data in AWS Systems Manager Parameter Store or AWS Secrets Manager, avoiding environment variables for secrets."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon API Gateway",
+              "Amazon DynamoDB",
+              "Amazon CloudWatch"
+            ],
+            "protocols": [
+              "HTTPS",
+              "API Gateway REST API"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(203, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": 251.10609960442002,
+        "y": 400.7955089444538
+      },
+      "data": {
+        "label": "Lambda - Transaction Service",
+        "service": "AWS Lambda",
+        "description": "Processes transactions and updates account balances",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/Lambda.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Compute",
+        "details": {
+          "summary": "This AWS Lambda function plays a critical role in processing transactions and updating account balances, making it a core component of the financial processing system. It is designed to be serverless, scalable, and integrated with other AWS services for efficient and secure operations.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$0.20/mo",
+              "medium": "$5.00/mo",
+              "high": "$50.00/mo"
+            },
+            "pricingNotes": "Costs are primarily based on the number of requests and execution duration. Low estimate assumes minimal usage (1000 requests, 100ms execution). Medium estimate assumes moderate usage (1 million requests, 500ms execution). High estimate assumes heavy usage (10 million requests, 1000ms execution)."
+          },
+          "resilience": {
+            "scaling": "Lambda automatically scales based on the number of incoming requests, ensuring high availability during peak loads.",
+            "failover": "Lambda functions are inherently resilient, with automatic retries and multi-AZ deployment ensuring failover without additional configuration."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const lambda = new lambda.Function(this, 'TransactionProcessor', {\n  runtime: lambda.Runtime.NODEJS_14_X,\n  handler: 'index.handler',\n  code: lambda.Code.fromAsset('lambda'),\n  environment: {\n    DYNAMODB_TABLE: 'AccountBalances'\n  }\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\nclient = boto3.client('lambda')\n\ndef lambda_handler(event, context):\n    response = client.invoke(\n        FunctionName='TransactionProcessor',\n        Payload=json.dumps(event)\n    )\n    return response"
+          },
+          "terraform": {
+            "code": "resource \"aws_lambda_function\" \"transaction_processor\" {\n  function_name = \"TransactionProcessor\"\n  handler       = \"index.handler\"\n  runtime       = \"nodejs14.x\"\n  role          = aws_iam_role.lambda_role.arn\n  filename      = \"lambda.zip\"\n  environment {\n    variables = {\n      DYNAMODB_TABLE = \"AccountBalances\"\n    }\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Implement IAM roles with least privilege for Lambda execution.",
+              "Encrypt sensitive data at rest and in transit using AWS KMS.",
+              "Enable AWS CloudTrail to monitor and log Lambda function invocations.",
+              "Regularly update Lambda function code dependencies to address vulnerabilities."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon API Gateway",
+              "Amazon DynamoDB",
+              "Amazon CloudWatch"
+            ],
+            "protocols": [
+              "HTTPS (API Gateway)",
+              "AWS SDK (DynamoDB)",
+              "CloudWatch Logs"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(165, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": -51.25321466520353,
+        "y": 399.93934596782356
+      },
+      "data": {
+        "label": "DynamoDB - Banking Data",
+        "service": "Amazon DynamoDB",
+        "description": "Stores account and transaction data",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/DynamoDB.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Database",
+        "details": {
+          "summary": "Amazon DynamoDB is a fully managed NoSQL database service that provides fast and predictable performance with seamless scalability. In this architecture, DynamoDB is used to store account and transaction data, serving as a durable and highly available data store. It integrates with AWS Lambda for serverless data processing, Amazon S3 for potential data backup or archival, and AWS Key Management Service (KMS) for encryption at rest.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$10/mo",
+              "medium": "$80/mo",
+              "high": "$250/mo"
+            },
+            "pricingNotes": "Costs are based on provisioned capacity (read/write capacity units) and storage. Low estimate assumes minimal usage (e.g., 10 GB storage and low read/write units). Medium estimate assumes moderate usage (e.g., 50 GB storage and moderate read/write units). High estimate assumes heavy usage (e.g., 200 GB storage and high read/write units)."
+          },
+          "resilience": {
+            "scaling": "DynamoDB automatically scales to handle increased traffic or storage needs. Provisioned capacity can be adjusted dynamically or switched to on-demand mode for unpredictable workloads.",
+            "failover": "Data is replicated across multiple Availability Zones (AZs) within a region, ensuring high availability and durability."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const table = new dynamodb.Table(this, 'AccountTransactionTable', {\n  tableName: 'AccountTransactionData',\n  partitionKey: { name: 'AccountId', type: dynamodb.AttributeType.STRING },\n  sortKey: { name: 'TransactionDate', type: dynamodb.AttributeType.STRING },\n  billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,\n  encryption: dynamodb.TableEncryption.KMS,\n  removalPolicy: cdk.RemovalPolicy.RETAIN,\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\ndynamodb = boto3.resource('dynamodb')\ntable = dynamodb.create_table(\n    TableName='AccountTransactionData',\n    KeySchema=[\n        {'AttributeName': 'AccountId', 'KeyType': 'HASH'},\n        {'AttributeName': 'TransactionDate', 'KeyType': 'RANGE'}\n    ],\n    AttributeDefinitions=[\n        {'AttributeName': 'AccountId', 'AttributeType': 'S'},\n        {'AttributeName': 'TransactionDate', 'AttributeType': 'S'}\n    ],\n    BillingMode='PAY_PER_REQUEST',\n    SSESpecification={'Enabled': True, 'SSEType': 'KMS'}\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_dynamodb_table\" \"account_transaction_table\" {\n  name           = \"AccountTransactionData\"\n  hash_key       = \"AccountId\"\n  range_key      = \"TransactionDate\"\n  billing_mode   = \"PAY_PER_REQUEST\"\n  attribute {\n    name = \"AccountId\"\n    type = \"S\"\n  }\n  attribute {\n    name = \"TransactionDate\"\n    type = \"S\"\n  }\n  server_side_encryption {\n    enabled = true\n    kms_key_arn = aws_kms_key.dynamodb_key.arn\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable encryption at rest using AWS KMS for enhanced data security.",
+              "Use IAM policies to restrict access to the DynamoDB table based on roles and responsibilities.",
+              "Enable DynamoDB Streams to track changes to items in the table for auditing purposes.",
+              "Regularly audit and rotate AWS KMS keys used for encryption.",
+              "Monitor DynamoDB metrics using Amazon CloudWatch to detect unusual activity."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "AWS Lambda",
+              "Amazon S3",
+              "AWS Key Management Service"
+            ],
+            "protocols": [
+              "HTTPS",
+              "AWS SDK"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(275, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": 249.5562330877007,
+        "y": 403.8676308552959
+      },
+      "data": {
+        "label": "Cognito",
+        "service": "Amazon Cognito",
+        "description": "Manages user authentication and authorization",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/Cognito.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Security",
+        "details": {
+          "summary": "Amazon Cognito is a user identity and app data synchronization service that helps you securely manage and synchronize user data for your web and mobile apps. In this architecture, it is used to manage user authentication and authorization, providing a secure way to handle user identities and access control. It integrates with Amazon API Gateway to protect your APIs and ensure that only authenticated and authorized users can access them.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$0.0056/mo",
+              "medium": "$0.28/mo",
+              "high": "$1.40/mo"
+            },
+            "pricingNotes": "Amazon Cognito pricing is based on the number of monthly active users (MAU) and the number of sync operations. The cost estimation provided is based on the number of MAU, with the low estimate being for 1,000 MAU, the medium estimate for 50,000 MAU, and the high estimate for 250,000 MAU. Sync operations are charged at $0.08 per 1,000 operations."
+          },
+          "resilience": {
+            "scaling": "Amazon Cognito automatically scales to handle the number of users and authentication requests, ensuring high availability and low latency.",
+            "failover": "Amazon Cognito provides built-in failover and disaster recovery, with data replication across multiple Availability Zones."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "import * as cognito from '@aws-cdk/aws-cognito';\n\nconst userPool = new cognito.UserPool(this, 'UserPool', {\n  userPoolName: 'MyUserPool',\n  selfSignUpEnabled: true,\n  autoVerify: { email: true },\n  standardAttributes: { email: { required: true } }\n});\n\nconst userPoolClient = new cognito.UserPoolClient(this, 'UserPoolClient', {\n  userPool: userPool,\n  generateSecret: false\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "import boto3\n\ncognito_client = boto3.client('cognito-idp')\n\nresponse = cognito_client.admin_create_user(\n    UserPoolId='us-east-1_xxxxxx',\n    Username='user@example.com',\n    TemporaryPassword='password',\n    UserAttributes=[\n        {'Name': 'email', 'Value': 'user@example.com'},\n        {'Name': 'email_verified', 'Value': 'true'}\n    ]\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_cognito_user_pool\" \"pool\" {\n  name = \"MyUserPool\"\n  username_attributes = [\"email\"]\n  auto_verified_attributes = [\"email\"]\n}\n\nresource \"aws_cognito_user_pool_client\" \"client\" {\n  name = \"MyUserPoolClient\"\n  user_pool_id = aws_cognito_user_pool.pool.id\n  generate_secret = false\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable Multi-Factor Authentication (MFA) for added security.",
+              "Use secure password policies, including length, complexity, and expiration requirements.",
+              "Regularly rotate credentials and enforce strong password policies.",
+              "Monitor user activity and set up alerts for suspicious behavior.",
+              "Implement role-based access control (RBAC) to restrict access to sensitive resources."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon API Gateway"
+            ],
+            "protocols": [
+              "HTTPS",
+              "JWT"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(108, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": 104.84645059187899,
+        "y": 952.1143360864489
+      },
+      "data": {
+        "label": "CloudWatch",
+        "service": "Amazon CloudWatch",
+        "description": "Monitors application performance and logs",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "management",
+        "icon": "/icons/aws-icons/CloudWatch.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F1F8E9",
+        "domain": "Management",
+        "details": {
+          "summary": "Amazon CloudWatch is a monitoring and observability service that tracks metrics, collects and monitors log files, and responds to system-wide performance changes. In this architecture, it monitors the performance and logs of two AWS Lambda functions, providing insights into their execution and helping to identify issues or bottlenecks.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$0.01/mo",
+              "medium": "$25/mo",
+              "high": "$150/mo"
+            },
+            "pricingNotes": "Amazon CloudWatch pricing is based on the number of metrics, logs, and alarms used. The low estimate assumes minimal usage, while the high estimate considers extensive monitoring with multiple metrics and logs."
+          },
+          "resilience": {
+            "scaling": "CloudWatch automatically scales with the number of resources being monitored. It can handle large volumes of metrics and logs without manual intervention.",
+            "failover": "CloudWatch has built-in redundancy and is designed to be highly available. It automatically fails over to another Availability Zone in case of an outage."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const cloudwatchDashboard = new cloudwatch.Dashboard(this, 'Dashboard', {\n  dashboardName: 'LambdaPerformanceDashboard',\n  widgets: [\n    new cloudwatch.TextWidget({\n      markdown: '# Lambda Performance Overview',\n      width: 24, height: 1\n    }),\n    new cloudwatch.GraphWidget({\n      title: 'Invocations',\n      width: 12, height: 6,\n      left: [lambdaFunction1.metricInvocations()],\n      right: [lambdaFunction2.metricInvocations()]\n    })\n  ]\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "cloudwatch_client = boto3.client('cloudwatch')\nresponse = cloudwatch_client.put_metric_alarm(\n    AlarmName='LambdaErrorsAlarm',\n    ComparisonOperator='GreaterThanOrEqualToThreshold',\n    EvaluationPeriods=1,\n    MetricName='Errors',\n    Namespace='AWS/Lambda',\n    Period=60,\n    Statistic='Sum',\n    Threshold=1,\n    ActionsEnabled=True,\n    AlarmActions=['arn:aws:sns:us-west-2:123456789012:MyTopic'],\n    Dimensions=[{'Name': 'FunctionName', 'Value': 'MyLambdaFunction'}]\n)"
+          },
+          "terraform": {
+            "code": "resource \"aws_cloudwatch_log_group\" \"lambda_logs\" {\n  name              = \"/aws/lambda/my-lambda-function\"\n  retention_in_days = 14\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"lambda_errors\" {\n  alarm_name          = \"LambdaErrorsAlarm\"\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = \"1\"\n  metric_name         = \"Errors\"\n  namespace           = \"AWS/Lambda\"\n  period              = \"60\"\n  statistic           = \"Sum\"\n  threshold           = \"1\"\n  treat_missing_data  = \"breaching\"\n  dimensions = {\n    FunctionName = \"MyLambdaFunction\"\n  }\n  alarm_actions = [\"arn:aws:sns:us-west-2:123456789012:MyTopic\"]\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable CloudWatch encryption at rest using AWS KMS for sensitive log data.",
+              "Control access to CloudWatch resources using IAM policies and least privilege principles.",
+              "Monitor CloudWatch metrics for unusual activity, such as spikes in error rates or unexpected changes in resource utilization."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "AWS Lambda"
+            ],
+            "protocols": [
+              "HTTPS",
+              "CloudWatch API"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(27, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": 254.56982939878355,
+        "y": 396.3534037791008
+      },
+      "data": {
+        "label": "S3 - Backup",
+        "service": "Amazon S3",
+        "description": "Stores encrypted backups of banking data",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/S3.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5",
+        "domain": "Storage",
+        "details": {
+          "summary": "Amazon S3 is used to store encrypted backups of banking data, ensuring data durability, availability, and security. It integrates with Amazon DynamoDB for metadata management and supports seamless data retrieval and backup processes.",
+          "costEstimation": {
+            "monthly": {
+              "low": "$10/mo",
+              "medium": "$80/mo",
+              "high": "$250/mo"
+            },
+            "pricingNotes": "Costs depend on storage usage, data transfer, and request frequency. Encryption and lifecycle policies can optimize costs further."
+          },
+          "resilience": {
+            "scaling": "S3 automatically scales to handle any amount of data, ensuring backups are stored without manual intervention.",
+            "failover": "Data is redundantly stored across multiple Availability Zones, ensuring high durability and availability even in case of failures."
+          },
+          "cdk": {
+            "language": "typescript",
+            "code": "const bucket = new s3.Bucket(this, 'BackupBucket', {\n  encryption: s3.BucketEncryption.S3_MANAGED,\n  versioned: true,\n  removalPolicy: cdk.RemovalPolicy.RETAIN,\n});"
+          },
+          "sdk": {
+            "language": "python",
+            "code": "s3 = boto3.client('s3')\nresponse = s3.create_bucket(Bucket='banking-backups', CreateBucketConfiguration={'LocationConstraint': 'us-west-2'})\ns3.put_object(Bucket='banking-backups', Key='backup.enc', Body=encrypted_data)"
+          },
+          "terraform": {
+            "code": "resource \"aws_s3_bucket\" \"backup_bucket\" {\n  bucket = \"banking-backups\"\n  acl    = \"private\"\n  versioning {\n    enabled = true\n  }\n  server_side_encryption_configuration {\n    rule {\n      apply_server_side_encryption_by_default {\n        sse_algorithm = \"AES256\"\n      }\n    }\n  }\n}"
+          },
+          "security": {
+            "recommendations": [
+              "Enable server-side encryption (SSE) using AWS KMS or S3 Managed Keys.",
+              "Implement bucket policies to restrict access to authorized users and services only.",
+              "Enable versioning and lifecycle policies to manage data retention and reduce costs.",
+              "Regularly audit access logs and monitor for suspicious activities."
+            ]
+          },
+          "integration": {
+            "connectedTo": [
+              "Amazon DynamoDB"
+            ],
+            "protocols": [
+              "HTTPS",
+              "AWS SDK"
+            ]
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(145, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    },
+    {
+      "id": "node8",
+      "type": "awsService",
+      "position": {
+        "x": 96.53722517664046,
+        "y": 801.6154285364096
+      },
+      "data": {
+        "label": "KMS",
+        "service": "AWS Key Management Service",
+        "description": "Manages encryption keys for data at rest and in transit",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "security",
+        "icon": "/icons/aws-icons/KMS.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#FFEBEE",
+        "domain": "Security",
+        "details": {
+          "summary": "AWS Key Management Service service in the architecture",
+          "costEstimation": {
+            "monthly": {
+              "low": "Varies",
+              "medium": "Varies",
+              "high": "Varies"
+            },
+            "pricingNotes": "Cost depends on usage patterns"
+          },
+          "resilience": {
+            "scaling": "Auto-scaling available",
+            "failover": "Depends on configuration"
+          },
+          "security": {
+            "recommendations": [
+              "Follow AWS security best practices"
+            ]
+          },
+          "integration": {
+            "connectedTo": [],
+            "protocols": []
+          }
+        }
+      },
+      "style": {
+        "background": "hsl(77, 70%, 80%)",
+        "border": "2px solid #000",
+        "borderRadius": "8px",
+        "padding": "10px"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers account service Lambda function",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node1",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers transaction service Lambda function",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node2",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Reads/writes account data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node3",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Updates transaction data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node1",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Authenticates user requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node2",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Logs account service activity",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node3",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Logs transaction service activity",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge8",
+      "source": "node4",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Backs up banking data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge9",
+      "source": "node4",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Encrypts data at rest",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "edge10",
+      "source": "node1",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Encrypts data in transit",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Using AWS, Design a well architected serverless architecture for banking services.",
+    "rationale": "Generated using Cohere Command A (March 2025) - 8 services with 1 icons resolved",
+    "timestamp": "2025-06-14T21:50:07.559Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-06-14T21:50:07.559Z",
+    "lastEditedBy": "Generator"
+  }
+}

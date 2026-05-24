@@ -1,0 +1,353 @@
+{
+  "nodes": [
+    {
+      "id": "api-gateway",
+      "type": "awsService",
+      "position": {
+        "x": -45.41179886112821,
+        "y": 404.3009186940476
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Handles HTTP requests and routes them to appropriate services",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/API-Gateway.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "lambda-functions",
+      "type": "awsService",
+      "position": {
+        "x": -348.4983793035152,
+        "y": 400.10232543087517
+      },
+      "data": {
+        "label": "Lambda Functions",
+        "service": "AWS Lambda",
+        "description": "Serverless compute for executing business logic",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "dynamodb",
+      "type": "awsService",
+      "position": {
+        "x": -46.011810586943426,
+        "y": 395.1296382017572
+      },
+      "data": {
+        "label": "DynamoDB",
+        "service": "Amazon DynamoDB",
+        "description": "NoSQL database for fast and predictable performance",
+        "estCost": "$50/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "s3",
+      "type": "awsService",
+      "position": {
+        "x": 250.68090492931253,
+        "y": 398.10268624370013
+      },
+      "data": {
+        "label": "S3",
+        "service": "Amazon S3",
+        "description": "Object storage for static files and media",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "cognito",
+      "type": "awsService",
+      "position": {
+        "x": -54.39908764612597,
+        "y": 398.6551846452743
+      },
+      "data": {
+        "label": "Cognito",
+        "service": "Amazon Cognito",
+        "description": "User authentication and authorization service",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "cloudwatch",
+      "type": "awsService",
+      "position": {
+        "x": 254.46896270192835,
+        "y": 395.4776509283573
+      },
+      "data": {
+        "label": "CloudWatch",
+        "service": "Amazon CloudWatch",
+        "description": "Monitoring and logging service",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "sns",
+      "type": "awsService",
+      "position": {
+        "x": 549.3928009931057,
+        "y": 396.7797950742319
+      },
+      "data": {
+        "label": "SNS",
+        "service": "Amazon SNS",
+        "description": "Pub/Sub messaging service for notifications",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "elasticache",
+      "type": "awsService",
+      "position": {
+        "x": -351.61531562332516,
+        "y": 570.1254832372739
+      },
+      "data": {
+        "label": "ElastiCache",
+        "service": "Amazon ElastiCache",
+        "description": "In-memory caching for improved performance",
+        "estCost": "$30/month",
+        "faultTolerance": "Medium",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "application-load-balancer",
+      "type": "awsService",
+      "position": {
+        "x": 252.17823431973895,
+        "y": 395.74751872496455
+      },
+      "data": {
+        "label": "Application Load Balancer",
+        "service": "Elastic Load Balancing",
+        "description": "Distributes incoming traffic across multiple targets",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/ElastiCache.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "auto-scaling-group",
+      "type": "awsService",
+      "position": {
+        "x": -52.08055742846688,
+        "y": 570.774422633936
+      },
+      "data": {
+        "label": "Auto Scaling Group",
+        "service": "AWS Auto Scaling",
+        "description": "Automatically adjusts compute capacity based on demand",
+        "estCost": "$0/month (pay-per-use)",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "application-load-balancer",
+      "target": "api-gateway",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Routes incoming HTTP requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "e2",
+      "source": "api-gateway",
+      "target": "lambda-functions",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Triggers Lambda functions via HTTP requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "e3",
+      "source": "lambda-functions",
+      "target": "dynamodb",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Reads/writes data to DynamoDB",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "e4",
+      "source": "lambda-functions",
+      "target": "s3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Stores/retrieves files from S3",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "e5",
+      "source": "lambda-functions",
+      "target": "elasticache",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Caches data in ElastiCache for improved performance",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "e6",
+      "source": "api-gateway",
+      "target": "cognito",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Validates user authentication via Cognito",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "e7",
+      "source": "lambda-functions",
+      "target": "cloudwatch",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Sends logs and metrics to CloudWatch",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "e8",
+      "source": "lambda-functions",
+      "target": "sns",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Publishes notifications to SNS",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "e9",
+      "source": "auto-scaling-group",
+      "target": "lambda-functions",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Scales Lambda functions based on demand",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Design a well architected backend using serverless aws",
+    "rationale": "Generated using Cohere Command A (March 2025) - 7 services with 1 icons resolved",
+    "timestamp": "2025-07-03T14:57:43.323Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-07-03T15:21:13.165Z",
+    "lastEditedBy": "Claudio Chat",
+    "title": "Scalable Web Application Architecture",
+    "description": "Updated architecture to improve scalability and performance",
+    "estimatedCost": "$170/month",
+    "changes": "Added Application Load Balancer for traffic distribution, ElastiCache for in-memory caching, and Auto Scaling Group for dynamic scaling of Lambda functions. Improved fault tolerance and performance across all layers.",
+    "lastModified": "2025-07-03T15:21:13.165Z",
+    "modificationHistory": [
+      {
+        "timestamp": "2025-07-03T15:21:13.165Z",
+        "request": "What is the best way to scale my web app? given the solution",
+        "changes": "Added Application Load Balancer for traffic distribution, ElastiCache for in-memory caching, and Auto Scaling Group for dynamic scaling of Lambda functions. Improved fault tolerance and performance across all layers."
+      }
+    ]
+  }
+}

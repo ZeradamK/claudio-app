@@ -1,0 +1,285 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": -51.6815172194995,
+        "y": 401.7046944483213
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Handles incoming API requests",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/API-Gateway.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": -199.3866128432913,
+        "y": 404.92591244187463
+      },
+      "data": {
+        "label": "Application Server",
+        "service": "AWS Lambda",
+        "description": "Processes API requests and interacts with data layers",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": -202.90266839742378,
+        "y": 399.58439081425706
+      },
+      "data": {
+        "label": "Product Catalog",
+        "service": "Amazon DynamoDB (On-Demand)",
+        "description": "Stores product catalog data",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": 96.63610745714473,
+        "y": 403.42837279419024
+      },
+      "data": {
+        "label": "Order Management",
+        "service": "Amazon RDS (PostgreSQL) - Burstable Instance",
+        "description": "Manages order processing and storage",
+        "estCost": "$25/month",
+        "faultTolerance": "Medium",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": 104.30682785996501,
+        "y": 400.5704435292771
+      },
+      "data": {
+        "label": "User Management",
+        "service": "Amazon Cognito",
+        "description": "Handles user authentication and management",
+        "estCost": "$3/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": 401.0395455094065,
+        "y": 402.1601171944752
+      },
+      "data": {
+        "label": "Product Images",
+        "service": "Amazon S3 (Infrequent Access)",
+        "description": "Stores product images with lifecycle policies",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": 253.45555896707137,
+        "y": 400.87903973519553
+      },
+      "data": {
+        "label": "CDN",
+        "service": "Amazon CloudFront",
+        "description": "Delivers cached content to users",
+        "estCost": "$15/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node8",
+      "type": "awsService",
+      "position": {
+        "x": 399.9628200474211,
+        "y": 403.93919474145304
+      },
+      "data": {
+        "label": "Monitoring",
+        "service": "Amazon CloudWatch (Basic)",
+        "description": "Monitors application and infrastructure",
+        "estCost": "$7/month",
+        "faultTolerance": "Medium",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "API requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node2",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Product data retrieval",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node2",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Order processing",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node2",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "User authentication",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node3",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Image storage",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node6",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Content delivery",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node2",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Monitoring and logging",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Using AWS, Design a well architected backend for e-commerce platforms specifically for clothing brands. make it scalable and use compute that is necessary.",
+    "rationale": "Generated using Cohere Command A (March 2025) - 8 services with 1 icons resolved",
+    "timestamp": "2025-07-04T15:15:21.759Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-07-04T15:18:06.092Z",
+    "lastEditedBy": "Claudio Chat",
+    "title": "Cost-Optimized E-Commerce Architecture",
+    "description": "Optimized architecture for cost efficiency",
+    "estimatedCost": "$90/month",
+    "changes": "1. Switched DynamoDB to On-Demand pricing for cost predictability. 2. Downgraded RDS to a burstable instance for non-critical workloads. 3. Moved S3 to Infrequent Access storage class for less frequently accessed images. 4. Reduced CloudWatch usage to basic monitoring. 5. Adjusted Lambda and API Gateway usage to match expected traffic patterns.",
+    "lastModified": "2025-07-04T15:18:06.092Z",
+    "modificationHistory": [
+      {
+        "timestamp": "2025-07-04T15:18:06.092Z",
+        "request": "how can i optimize for cost",
+        "changes": "1. Switched DynamoDB to On-Demand pricing for cost predictability. 2. Downgraded RDS to a burstable instance for non-critical workloads. 3. Moved S3 to Infrequent Access storage class for less frequently accessed images. 4. Reduced CloudWatch usage to basic monitoring. 5. Adjusted Lambda and API Gateway usage to match expected traffic patterns."
+      }
+    ]
+  }
+}

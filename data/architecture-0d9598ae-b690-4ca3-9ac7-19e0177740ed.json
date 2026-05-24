@@ -1,0 +1,511 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "awsService",
+      "position": {
+        "x": 102.93822185617789,
+        "y": 398.99929031457776
+      },
+      "data": {
+        "label": "API Gateway",
+        "service": "Amazon API Gateway",
+        "description": "Exposes APIs for product and order services",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "presentation",
+        "icon": "/icons/aws-icons/API-Gateway.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node2",
+      "type": "awsService",
+      "position": {
+        "x": -345.10627232460024,
+        "y": 403.8305920046389
+      },
+      "data": {
+        "label": "Lambda - Products",
+        "service": "AWS Lambda",
+        "description": "Handles product-related business logic",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node3",
+      "type": "awsService",
+      "position": {
+        "x": -48.51317915469432,
+        "y": 401.96027751165843
+      },
+      "data": {
+        "label": "Lambda - Orders",
+        "service": "AWS Lambda",
+        "description": "Handles order processing and notifications",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node4",
+      "type": "awsService",
+      "position": {
+        "x": -201.2026447568398,
+        "y": 398.5647362859383
+      },
+      "data": {
+        "label": "DynamoDB - Products",
+        "service": "Amazon DynamoDB",
+        "description": "Stores product data",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node5",
+      "type": "awsService",
+      "position": {
+        "x": 104.60394836809323,
+        "y": 397.5053917558164
+      },
+      "data": {
+        "label": "DynamoDB - Orders",
+        "service": "Amazon DynamoDB",
+        "description": "Stores order data",
+        "estCost": "$25/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node6",
+      "type": "awsService",
+      "position": {
+        "x": 402.2013700643861,
+        "y": 401.276106055936
+      },
+      "data": {
+        "label": "S3 - Images",
+        "service": "Amazon S3",
+        "description": "Stores product images",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "data",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node7",
+      "type": "awsService",
+      "position": {
+        "x": 251.26644101274476,
+        "y": 398.72705861767935
+      },
+      "data": {
+        "label": "SNS - Notifications",
+        "service": "Amazon SNS",
+        "description": "Sends order notifications",
+        "estCost": "$5/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node8",
+      "type": "awsService",
+      "position": {
+        "x": 554.6500826256066,
+        "y": 401.4431250680821
+      },
+      "data": {
+        "label": "CloudWatch",
+        "service": "Amazon CloudWatch",
+        "description": "Monitors service metrics",
+        "estCost": "$10/month",
+        "faultTolerance": "High",
+        "layer": "application",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node9",
+      "type": "awsService",
+      "position": {
+        "x": -346.8622642585208,
+        "y": 404.19860556650946
+      },
+      "data": {
+        "label": "VPC",
+        "service": "Amazon VPC",
+        "description": "Isolated network environment with public and private subnets",
+        "estCost": "$20/month",
+        "faultTolerance": "High",
+        "layer": "network",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node10",
+      "type": "awsService",
+      "position": {
+        "x": -47.41059544784588,
+        "y": 396.5804326593845
+      },
+      "data": {
+        "label": "Public Subnet",
+        "service": "Amazon VPC Subnet",
+        "description": "Hosts API Gateway and NAT Gateway",
+        "estCost": "$0/month",
+        "faultTolerance": "High",
+        "layer": "network",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node11",
+      "type": "awsService",
+      "position": {
+        "x": 249.4840104550248,
+        "y": 396.8112760264491
+      },
+      "data": {
+        "label": "Private Subnet",
+        "service": "Amazon VPC Subnet",
+        "description": "Hosts Lambda functions, DynamoDB, and other private resources",
+        "estCost": "$0/month",
+        "faultTolerance": "High",
+        "layer": "network",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node12",
+      "type": "awsService",
+      "position": {
+        "x": 545.5276671847646,
+        "y": 396.1164274778447
+      },
+      "data": {
+        "label": "Internet Gateway",
+        "service": "Amazon Internet Gateway",
+        "description": "Provides internet access to public subnet",
+        "estCost": "$0/month",
+        "faultTolerance": "High",
+        "layer": "network",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    },
+    {
+      "id": "node13",
+      "type": "awsService",
+      "position": {
+        "x": -347.93624443111986,
+        "y": 567.2470266454877
+      },
+      "data": {
+        "label": "NAT Gateway",
+        "service": "Amazon NAT Gateway",
+        "description": "Provides internet access to private subnet resources",
+        "estCost": "$30/month",
+        "faultTolerance": "High",
+        "layer": "network",
+        "icon": "/icons/aws-icons/aws-generic.svg",
+        "iconConfidence": 1,
+        "iconSource": "direct",
+        "layerColor": "#F5F5F5"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "node1",
+      "target": "node2",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Routes product requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge2",
+      "source": "node1",
+      "target": "node3",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Routes order requests",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge3",
+      "source": "node2",
+      "target": "node4",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Reads/writes product data",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge4",
+      "source": "node3",
+      "target": "node5",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Processes and stores orders",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge5",
+      "source": "node2",
+      "target": "node6",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Stores and retrieves product images",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge6",
+      "source": "node3",
+      "target": "node7",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Sends order notifications",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge7",
+      "source": "node2",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Logs product service metrics",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge8",
+      "source": "node3",
+      "target": "node8",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Logs order service metrics",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge9",
+      "source": "node9",
+      "target": "node10",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Contains public subnet",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge10",
+      "source": "node9",
+      "target": "node11",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Contains private subnet",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge11",
+      "source": "node9",
+      "target": "node12",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Attached to Internet Gateway",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge12",
+      "source": "node10",
+      "target": "node12",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Public subnet access to internet",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge13",
+      "source": "node11",
+      "target": "node13",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Private subnet access to internet via NAT Gateway",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge14",
+      "source": "node1",
+      "target": "node10",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Deployed in public subnet",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge15",
+      "source": "node2",
+      "target": "node11",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Deployed in private subnet",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    },
+    {
+      "id": "edge16",
+      "source": "node3",
+      "target": "node11",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Deployed in private subnet",
+      "style": {
+        "stroke": "#000000",
+        "strokeWidth": 2,
+        "strokeDasharray": "none",
+        "animation": "none"
+      }
+    }
+  ],
+  "metadata": {
+    "prompt": "Using AWS, Design a full backend system, for e-commerce business with high storage and compute, serverless architecture",
+    "rationale": "Generated using Cohere Command A (March 2025) - 8 services with 1 icons resolved",
+    "timestamp": "2025-07-08T18:35:10.754Z",
+    "cloudProvider": "aws",
+    "generatedBy": "cohere",
+    "lastEditedAt": "2025-07-08T18:37:27.421Z",
+    "lastEditedBy": "Claudio Chat",
+    "title": "E-commerce Architecture with Private VPC",
+    "description": "Isolated network environment with public and private subnets for enhanced security and control.",
+    "estimatedCost": "$145/month",
+    "changes": "Added Amazon VPC with public and private subnets, Internet Gateway, and NAT Gateway. Deployed API Gateway in the public subnet and Lambda functions, DynamoDB, and other resources in the private subnet.",
+    "lastModified": "2025-07-08T18:37:27.421Z",
+    "modificationHistory": [
+      {
+        "timestamp": "2025-07-08T18:37:27.421Z",
+        "request": "Implement a private VPC with proper public and private subnets",
+        "changes": "Added Amazon VPC with public and private subnets, Internet Gateway, and NAT Gateway. Deployed API Gateway in the public subnet and Lambda functions, DynamoDB, and other resources in the private subnet."
+      }
+    ]
+  }
+}
