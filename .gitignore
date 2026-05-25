@@ -54,3 +54,10 @@ credentials*.json
 
 # misc legacy
 .genkit/
+
+# runtime data — encrypted BYOK keys, cloud credentials, usage logs.
+# Local-only state; replaced by Postgres in Phase 2. Never commit.
+/data/user-profiles.json
+/data/cloud-connections.json
+/data/cloud-inventory-*.json
+/data/ai-usage.jsonl
