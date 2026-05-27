@@ -23,10 +23,29 @@ const PROVIDER_BASE_URLS: Record<string, string> = {
   'x-ai/': 'https://api.x.ai/v1/chat/completions',
 };
 
+const PROVIDER_ENV_KEYS: Record<string, string> = {
+  'openai/': 'OPENAI_API_KEY',
+  'deepseek/': 'DEEPSEEK_API_KEY',
+  'mistralai/': 'MISTRAL_API_KEY',
+  'meta-llama/': 'GROQ_API_KEY',
+  'qwen/': 'DASHSCOPE_API_KEY',
+  'x-ai/': 'XAI_API_KEY',
+};
+
 const PROVIDER_PREFIXES = Object.keys(PROVIDER_BASE_URLS);
 
 function findPrefix(model: string): string | null {
   return PROVIDER_PREFIXES.find((p) => model.startsWith(p)) ?? null;
+}
+
+function getServerEnvKey(model: string): string | undefined {
+  const prefix = findPrefix(model);
+  if (!prefix) return undefined;
+  return process.env[PROVIDER_ENV_KEYS[prefix]]?.trim() || undefined;
+}
+
+export function hasServerEnvKey(model: string): boolean {
+  return getServerEnvKey(model) !== undefined;
 }
 
 function stripPrefix(model: string, prefix: string): string {
@@ -61,9 +80,10 @@ export class OpenAICompatAdapter implements ProviderAdapter {
     const url = PROVIDER_BASE_URLS[prefix];
     const modelName = stripPrefix(opts.model, prefix);
 
-    if (!opts.apiKey) {
+    const apiKey = opts.apiKey ?? getServerEnvKey(opts.model);
+    if (!apiKey) {
       throw new Error(
-        `No API key provided for ${prefix} — add it via /settings/api-keys or set the corresponding server env var.`
+        `No API key for ${prefix} — add via /settings/api-keys or set ${PROVIDER_ENV_KEYS[prefix]} in .env.local.`
       );
     }
 
@@ -85,7 +105,7 @@ export class OpenAICompatAdapter implements ProviderAdapter {
     const resp = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${opts.apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),

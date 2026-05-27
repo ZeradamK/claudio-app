@@ -22,7 +22,7 @@
 
 import { anthropicAdapter } from './providers/anthropic';
 import { googleGeminiAdapter } from './providers/google';
-import { openAICompatAdapter } from './providers/openai-compat';
+import { openAICompatAdapter, hasServerEnvKey } from './providers/openai-compat';
 import { openRouterAdapter } from './providers/openrouter';
 import { computeCost } from './pricing';
 import { getRouteConfig } from './routing';
@@ -92,10 +92,15 @@ function selectAdapter(
   }
 
   // allow-server: prefer the Anthropic direct adapter when the model is
-  // Anthropic-shaped (gives us cache_control support). Otherwise OpenRouter
-  // with the server's key.
+  // Anthropic-shaped (gives us cache_control support). For OpenAI-compat
+  // providers, prefer the direct adapter when a server env var is set
+  // (e.g. OPENAI_API_KEY in .env.local) — lets dev/test work without an
+  // OpenRouter account. Falls through to OpenRouter otherwise.
   if (anthropicAdapter.supports(model)) {
     return { adapter: anthropicAdapter, apiKey: undefined };
+  }
+  if (openAICompatAdapter.supports(model) && hasServerEnvKey(model)) {
+    return { adapter: openAICompatAdapter, apiKey: undefined };
   }
   return { adapter: openRouterAdapter, apiKey: undefined };
 }
