@@ -113,11 +113,19 @@ export class OpenAICompatAdapter implements ProviderAdapter {
 
     if (!resp.ok) {
       const text = await resp.text().catch(() => '');
-      throw new Error(`${prefix} ${resp.status}: ${text || resp.statusText}`);
+      // CWE-209 (information exposure via error messages): never echo
+      // upstream body verbatim — provider errors sometimes include the
+      // bearer-token-prefix, request id, or org id. Redact the api key
+      // and cap length.
+      const safe = text.replaceAll(apiKey, '<redacted>').slice(0, 256);
+      throw new Error(prefix + ' ' + resp.status + ': ' + (safe || resp.statusText));
     }
 
     const data = (await resp.json()) as OpenAIResponse;
-    if (data.error) throw new Error(`${prefix} API error: ${data.error.message}`);
+    if (data.error) {
+      const msg = data.error.message.replaceAll(apiKey, '<redacted>').slice(0, 256);
+      throw new Error(prefix + ' API error: ' + msg);
+    }
 
     const content = data.choices?.[0]?.message?.content ?? '';
     return {
