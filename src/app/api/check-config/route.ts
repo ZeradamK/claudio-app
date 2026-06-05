@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { isClaudeConfigured } from '@/lib/ai/claude';
 
+/**
+ * GET /api/check-config — booleans only.
+ *
+ * Used by the UI to show a "set up your API key" prompt when no AI
+ * provider is configured. Deliberately returns only booleans, never
+ * env var names or values (CWE-200: no information disclosure beyond
+ * the binary "is something configured" signal). The error message text
+ * is fixed and operator-facing — never echoes anything from env.
+ */
 export async function GET() {
   try {
     const claudeConfigured = isClaudeConfigured();
@@ -10,17 +19,16 @@ export async function GET() {
       cohereConfigured: claudeConfigured,
       claudeConfigured,
       error: !claudeConfigured
-        ? 'Claude API key (ANTHROPIC_API_KEY) is required. Add it to .env.local — see .env.example.'
+        ? 'AI provider not configured. Set ANTHROPIC_API_KEY or OPENROUTER_API_KEY in .env.local.'
         : null,
     });
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error checking API configuration:', error);
+  } catch {
+    // Swallow internal error details — only return the boolean state.
     return NextResponse.json(
       {
         cohereConfigured: false,
         claudeConfigured: false,
-        error: 'Failed to check API configuration',
+        error: 'Failed to check configuration',
       },
       { status: 500 }
     );
