@@ -20,6 +20,8 @@
 
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 
+import { assertSecureEnv } from '../security/startup';
+
 const ALGO = 'aes-256-gcm' as const;
 const NONCE_BYTES = 12;
 const KEY_BYTES = 32;
@@ -27,6 +29,10 @@ const KEY_BYTES = 32;
 let cachedKey: Buffer | null = null;
 function getKey(): Buffer {
   if (cachedKey) return cachedKey;
+  // Memoized check — first call runs the validators, subsequent calls are
+  // a no-op flag check. Guarantees we never start using encryption with
+  // a broken env config.
+  assertSecureEnv();
 
   const envKey = process.env.ENCRYPTION_KEY?.trim();
   if (!envKey) {
