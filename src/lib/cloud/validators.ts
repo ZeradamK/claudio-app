@@ -21,6 +21,20 @@ export class InvalidInputError extends Error {
   }
 }
 
+/**
+ * Thrown when the authenticated caller does not own the requested
+ * resource. Routes translate this into HTTP 404 (NOT 403) on purpose —
+ * a 403 would leak resource existence. See OWASP IDOR cheatsheet:
+ * never reveal whether a resource the caller cannot access exists.
+ */
+export class NotOwnerError extends Error {
+  readonly status = 404;
+  constructor(resourceType: string) {
+    super(resourceType + ' not found');
+    this.name = 'NotOwnerError';
+  }
+}
+
 // ─── Identifiers ──────────────────────────────────────────────────────────
 
 /** RFC 4122 v4 UUID, lowercase canonical form. */
