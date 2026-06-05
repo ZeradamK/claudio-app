@@ -64,6 +64,15 @@ export interface ClaudeRequestBase {
   useCase?: UseCase;
   /** Trace tag for cost rollups in the usage log. */
   traceTag?: string;
+  /**
+   * Authenticated caller id. Passed through to `runAI` so the plan gate
+   * applies rate limits + quotas + plan checks. Optional only because
+   * Phase-1 callers existed before the field; the router warns when it
+   * is absent. **Production deploys MUST set this** — see S5 audit.
+   *
+   * Routes should always derive this from `getOrCreateUserId()`.
+   */
+  userId?: string;
 }
 
 // ─── Non-streaming chat (delegates to router) ──────────────────────────────
@@ -76,6 +85,7 @@ export interface ClaudeChatResult {
 
 export async function claudeChat(opts: ClaudeRequestBase): Promise<ClaudeChatResult> {
   const req: AIRequest = {
+    userId: opts.userId,
     useCase: opts.useCase ?? 'general',
     system: opts.system,
     cacheable: opts.cacheable,
@@ -108,6 +118,7 @@ export async function claudeJson<T = unknown>(
   opts: ClaudeJsonOptions
 ): Promise<{ data: T; raw: string; usage: { input_tokens: number; output_tokens: number } }> {
   const req: AIRequest = {
+    userId: opts.userId,
     useCase: opts.useCase ?? 'general',
     system: opts.system,
     cacheable: opts.cacheable,
@@ -116,7 +127,10 @@ export async function claudeJson<T = unknown>(
     temperature: opts.temperature,
     maxTokens: opts.maxTokens,
     apiKeyOverride: opts.apiKey,
-    validateAs: 'json-generic',
+    // Use the route's declared validator (e.g. json-architecture for
+    // architecture-generation use-cases) rather than always forcing
+    // json-generic. This was a real bug — claudeJson({useCase:'architecture-generation'})
+    // was defeating the architecture schema check (audit bug #11).
     traceTag: opts.traceTag,
   };
   const resp = await runAI(req);
