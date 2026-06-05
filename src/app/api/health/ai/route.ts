@@ -5,7 +5,11 @@
  * recent usage summary so you can verify the orchestrator is wired and see
  * what's actually getting routed where.
  *
- * Auth: open in dev. Phase 4 puts it behind Clerk.
+ * Auth: only enabled in non-production environments OR when explicitly
+ * opted in via `ENABLE_HEALTH_AI_ENDPOINT=1`. The route exposes routing
+ * internals + recent spend; not a secret, but no reason to surface
+ * publicly. (Audit finding: 'health endpoint exposes routing internals
+ * with no auth'.)
  */
 
 import { NextResponse } from 'next/server';
@@ -13,7 +17,16 @@ import { NextResponse } from 'next/server';
 import { readUsageRows, summarize } from '@/lib/ai/cost-tracker';
 import { ROUTING_TABLE } from '@/lib/ai/routing';
 
+function isEnabled(): boolean {
+  if (process.env.NODE_ENV !== 'production') return true;
+  return process.env.ENABLE_HEALTH_AI_ENDPOINT === '1';
+}
+
 export async function GET() {
+  if (!isEnabled()) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   const providers = {
     openRouter: !!process.env.OPENROUTER_API_KEY?.trim(),
     anthropic: !!process.env.ANTHROPIC_API_KEY?.trim(),
