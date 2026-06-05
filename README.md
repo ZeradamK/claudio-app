@@ -43,6 +43,12 @@ Open the app, enter a prompt like *"VPC with EC2, RDS, ALB, and S3"*, and a diag
 | `pnpm start` | Run production build |
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm run audit:security` | 57-case CWE regression suite (cloud IDOR, YAML/template injection, mass assignment, missing auth, key handling) — see [SECURITY.md](./SECURITY.md) |
+
+## Security
+
+See [SECURITY.md](./SECURITY.md) for the CWE control map, operator
+checklist, and adversarial regression coverage.
 
 ## License
 
