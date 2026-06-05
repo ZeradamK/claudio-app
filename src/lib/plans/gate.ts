@@ -14,7 +14,7 @@
  */
 
 import { getPlan, isFlagshipModel, planAllowsServerModel } from './catalog';
-import { checkAndRecord } from './rate-limiter';
+import { peekRateLimit, recordRateLimit } from './rate-limiter';
 import { checkQuota } from './quota-tracker';
 import { getByokKey, getOrCreateProfile } from './store';
 import { providerForModel } from './types';
@@ -28,7 +28,15 @@ interface GateInput {
   candidateModel: string;
 }
 
-export async function gateForAttempt(input: GateInput): Promise<GateDecision> {
+/**
+ * Internal shared logic — runs every check except rate-limit (which is
+ * the only side-effectful one). Both peekForAttempt and gateForAttempt
+ * call this; gateForAttempt then additionally records a rate-limit slot.
+ */
+async function checkPolicy(
+  input: GateInput,
+  rateLimitMode: 'peek' | 'record'
+): Promise<GateDecision> {
   const { userId, useCase, candidateModel } = input;
   const profile = await getOrCreateProfile(userId);
   const plan = getPlan(profile.planId);
@@ -39,7 +47,7 @@ export async function gateForAttempt(input: GateInput): Promise<GateDecision> {
       kind: 'deny-feature-locked',
       resolvedModel: candidateModel,
       bypassesQuota: false,
-      message: `The "${useCase}" feature requires a higher plan than ${plan.name}.`,
+      message: 'The "' + useCase + '" feature requires a higher plan than ' + plan.name + '.',
     };
   }
 
@@ -66,20 +74,28 @@ export async function gateForAttempt(input: GateInput): Promise<GateDecision> {
       resolvedModel: candidateModel,
       bypassesQuota: false,
       message: isFlagshipModel(candidateModel)
-        ? `Flagship model ${candidateModel} requires BYOK or Enterprise.`
-        : `${candidateModel} is not included in the ${plan.name} plan. Upgrade or add a BYOK key.`,
+        ? 'Flagship model ' + candidateModel + ' requires BYOK or Enterprise.'
+        : candidateModel + ' is not included in the ' + plan.name + ' plan. Upgrade or add a BYOK key.',
     };
   }
 
-  // 4) Rate limit (calls per minute)
-  const rl = checkAndRecord(userId, plan.quota.callsPerMinute, 60_000);
+  // 4) Rate limit (calls per minute) — peek OR record.
+  const rl =
+    rateLimitMode === 'record'
+      ? recordRateLimit(userId, plan.quota.callsPerMinute, 60_000)
+      : peekRateLimit(userId, plan.quota.callsPerMinute, 60_000);
   if (!rl.allowed) {
     return {
       kind: 'deny-rate-limit',
       resolvedModel: candidateModel,
       bypassesQuota: false,
       retryAfter: rl.retryAfter,
-      message: `Rate limit: ${plan.quota.callsPerMinute} calls/minute. Try again in ${rl.retryAfter}s.`,
+      message:
+        'Rate limit: ' +
+        plan.quota.callsPerMinute +
+        ' calls/minute. Try again in ' +
+        rl.retryAfter +
+        's.',
     };
   }
 
@@ -90,7 +106,12 @@ export async function gateForAttempt(input: GateInput): Promise<GateDecision> {
       kind: 'deny-quota-exhausted',
       resolvedModel: candidateModel,
       bypassesQuota: false,
-      message: `Daily ${quotaCheck.reason} quota reached for ${plan.name}. Upgrade or add a BYOK key to continue.`,
+      message:
+        'Daily ' +
+        quotaCheck.reason +
+        ' quota reached for ' +
+        plan.name +
+        '. Upgrade or add a BYOK key to continue.',
     };
   }
 
@@ -104,14 +125,42 @@ export async function gateForAttempt(input: GateInput): Promise<GateDecision> {
 }
 
 /**
- * Convenience helper for routes/UIs that want a human-readable decision
- * without running an LLM call (e.g. previewing whether a button should be
- * enabled).
+ * Read-only gate check (S8 fix). Probes plan + BYOK + plan-allowlist +
+ * rate-limit + quota WITHOUT consuming a rate-limit slot. The router
+ * uses this when iterating its fallback list so a single user request
+ * burns at most one rate slot, not one per candidate model.
+ */
+export async function peekForAttempt(input: GateInput): Promise<GateDecision> {
+  return checkPolicy(input, 'peek');
+}
+
+/**
+ * Side-effectful gate decision. Used by callers that don't have a
+ * separate "I'm about to actually call upstream" step — they want
+ * check-and-consume in one shot.
+ *
+ * The router uses peekForAttempt in its candidate loop and a separate
+ * consumeRateSlot() before the upstream fetch, so this remains the entry
+ * point for non-router callers (claudeStream).
+ */
+export async function gateForAttempt(input: GateInput): Promise<GateDecision> {
+  return checkPolicy(input, 'record');
+}
+
+/**
+ * After peekForAttempt has approved a candidate and the router has
+ * decided to fire the upstream call, this commits one rate-limit slot
+ * for the user. No-op for BYOK decisions (bypassesQuota === true).
+ */
+export async function consumeRateSlot(userId: string): Promise<void> {
+  const profile = await getOrCreateProfile(userId);
+  const plan = getPlan(profile.planId);
+  recordRateLimit(userId, plan.quota.callsPerMinute, 60_000);
+}
+
+/**
+ * @deprecated Use peekForAttempt — same semantics, clearer name.
  */
 export async function previewGate(input: GateInput): Promise<GateDecision> {
-  // Same logic as gateForAttempt but WITHOUT consuming a rate-limit slot.
-  // We do it by snapshotting and inspecting without recording. For Phase
-  // 6.75 we just delegate — the rate-limit cost of a preview call is fine
-  // for now; Phase 7's Redis swap gives us a proper read-only inspector.
-  return gateForAttempt(input);
+  return peekForAttempt(input);
 }
