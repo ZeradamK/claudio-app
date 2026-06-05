@@ -219,6 +219,35 @@ for (const [env, allow, expected, label] of gateCases) {
   }
 }
 
+// ─── S5: every legacy AI route plumbs userId ─────────────────────────────
+//
+// File-system grep regression: if any route is added that calls one of
+// the legacy AI shims without also importing getOrCreateUserId, the
+// audit fails.
+
+import { execSync } from 'node:child_process';
+
+console.log('\n── S5 legacy AI route userId coverage ──');
+
+const aiCallers = execSync(
+  "grep -rln 'claudeChat\\|claudeJson\\|generateCohereChatCompletion\\|streamingCohereChatCompletion' src/app/api/ 2>/dev/null || true",
+  { encoding: 'utf8' }
+)
+  .trim()
+  .split('\n')
+  .filter(Boolean);
+
+for (const file of aiCallers) {
+  const body = execSync('cat ' + JSON.stringify(file), { encoding: 'utf8' });
+  if (body.includes('getOrCreateUserId')) {
+    console.log('  pass [S5] ' + file);
+    passes++;
+  } else {
+    console.error('  FAIL [S5] ' + file + ' — calls AI shim without userId import');
+    failures++;
+  }
+}
+
 console.log('\nFinal: ' + passes + ' passed, ' + failures + ' failed');
 if (failures > 0) process.exit(1);
 
