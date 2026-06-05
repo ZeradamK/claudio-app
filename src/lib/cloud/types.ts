@@ -24,6 +24,14 @@ export type CloudConnectionMode =
 
 export interface CloudConnection {
   id: string;
+  /**
+   * Owner of this connection. Set at create time from the authenticated
+   * caller's identity (currently the cookie-derived UUID, Phase 2 → Clerk
+   * user id). Every store read/write must filter by this — see CWE-639
+   * (Authorization Bypass Through User-Controlled Key) and CWE-285
+   * (Improper Authorization).
+   */
+  userId: string;
   name: string;
   provider: CloudProvider;
   mode: CloudConnectionMode;
