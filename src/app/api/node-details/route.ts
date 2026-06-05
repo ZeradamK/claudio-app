@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { claudeJson } from '@/lib/ai/claude';
+import { getOrCreateUserId } from '@/lib/auth/user';
 
 const SYSTEM_PROMPT = `You are a cloud architecture assistant helping developers understand and implement infrastructure components. For each node in the architecture diagram, provide a rich, context-specific response based on the node's function, service type, and its role in the architecture prompt.
 
@@ -42,6 +43,7 @@ Return ONLY the JSON object, no markdown fences, no prose.`;
 
 export async function POST(req: Request) {
   try {
+    const userId = await getOrCreateUserId();
     const { nodeId, serviceName, nodePurpose, userPrompt, connectedNodes } =
       await req.json();
 
@@ -57,6 +59,8 @@ Generate a detailed response about this node's role, implementation, and best pr
 `;
 
     const { data } = await claudeJson({
+      userId,
+      useCase: 'node-details',
       system: SYSTEM_PROMPT,
       message: prompt,
       temperature: 0.4,
