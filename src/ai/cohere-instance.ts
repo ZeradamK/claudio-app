@@ -46,6 +46,8 @@ interface CohereChatArgs {
   maxTokens?: number;
   chatHistory?: CohereChatHistoryItem[];
   connectors?: Array<{ id: string }>;
+  /** Authenticated caller id (S5 / CWE-862). Forwarded to claudeChat. */
+  userId?: string;
 }
 
 interface CohereStreamChunk {
@@ -71,6 +73,7 @@ function toClaudeHistory(
 export const cohereClient = {
   async chat(args: CohereChatArgs): Promise<{ text: string }> {
     const { content } = await claudeChat({
+      userId: args.userId,
       message: args.message,
       system: args.preamble,
       temperature: args.temperature,
@@ -87,6 +90,7 @@ export const cohereClient = {
     let error: unknown = null;
 
     const response = await claudeStream({
+      userId: args.userId,
       message: args.message,
       system: args.preamble,
       temperature: args.temperature,

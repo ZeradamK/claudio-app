@@ -5,16 +5,13 @@ import { detectEnhancedIntent } from '@/ai/jarvis-integration';
 import { getContextLevelForIntent, generateContextString, generateMessageHistoryContext } from '@/ai/context/contextManager';
 import { getOrCreateSession, updateSession } from '@/ai/jarvis-orchestrator';
 import { cohereClient } from '@/ai/cohere-instance';
+import { getOrCreateUserId } from '@/lib/auth/user';
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Check if Cohere API key is configured
-    if (!process.env.COHERE_API_KEY) {
-      return NextResponse.json(
-        { message: 'Cohere API key is not configured. Please add it to your .env.local file.' },
-        { status: 500 }
-      );
-    }
+    // Derive caller identity for the plan gate (cohereClient is a
+    // Claude-backed shim — userId flows through to claudeChat → runAI).
+    const userId = await getOrCreateUserId();
 
     // 2. Parse the request
     const body = await req.json();
@@ -88,10 +85,10 @@ YOUR TASK:
 - Use markdown formatting for clarity
 - For code, use proper code blocks with language tags`;
 
-    // Layer 5: Generate Response with Cohere
+    // Layer 5: Generate Response (cohereClient is Claude-backed shim).
     const cohereResponse = await cohereClient.chat({
+      userId,
       message,
-      model: process.env.COHERE_MODEL || 'command-r-plus', // Use command-r-plus by default, but allow override
       chatHistory: formattedHistory,
       temperature: 0.7,
       maxTokens: 2048,
