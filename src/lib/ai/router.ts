@@ -118,6 +118,11 @@ export async function runAI(req: AIRequest): Promise<AIResponse> {
   const attempts: AttemptLog[] = [];
   let totalCost = 0;
   let lastDenialMessage: string | undefined;
+  // S8 audit #2: a request may fall back from primary to a fallback model
+  // and the loop body fires adapter.call() once per non-denied candidate.
+  // Without this flag we would consume one rate slot per fallback attempt
+  // that ran (not just per request).
+  let rateSlotConsumed = false;
 
   for (const next of attemptList) {
     // Step 1: Run the gate (only when we have a userId — internal calls bypass).
@@ -194,11 +199,13 @@ export async function runAI(req: AIRequest): Promise<AIResponse> {
     };
 
     try {
-      // S8: now that we've picked an adapter we're actually going to call,
-      // commit one rate-limit slot. BYOK calls do not count against rate
-      // limits (bypassesQuota implies bypassesRate too).
-      if (req.userId && !gateDecision.bypassesQuota) {
+      // S8: commit at most ONE rate-limit slot per user request, even if
+      // we fall back through multiple candidates. BYOK calls do not count
+      // (bypassesQuota implies bypassesRate too). Once consumed, the flag
+      // stays set for the rest of the request's fallback chain.
+      if (req.userId && !gateDecision.bypassesQuota && !rateSlotConsumed) {
         await consumeRateSlot(req.userId);
+        rateSlotConsumed = true;
       }
 
       const callOpts: ProviderCallOpts = {
