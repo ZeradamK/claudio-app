@@ -268,6 +268,16 @@ export async function claudeStream(opts: ClaudeStreamOptions): Promise<Response>
 
   const readable = new ReadableStream({
     async start(controller) {
+      // Capture partial-usage state so a mid-stream error still records
+      // the tokens we did burn (audit #6 — server pays for partial work,
+      // user should be charged).
+      const partial: { input_tokens: number; output_tokens: number } = {
+        input_tokens: 0,
+        output_tokens: 0,
+      };
+      let havePartial = false;
+      let streamError: unknown = null;
+
       try {
         const stream = client.messages.stream({
           model: candidateModel,
@@ -282,51 +292,74 @@ export async function claudeStream(opts: ClaudeStreamOptions): Promise<Response>
             opts.onDelta?.(text);
             controller.enqueue(encoder.encode(text));
           }
+          if (event.type === 'message_delta' && event.usage) {
+            // Anthropic emits running usage on message_delta — output_tokens
+            // is incremental. Capture so we have something to charge if the
+            // loop bails after this point.
+            partial.output_tokens = event.usage.output_tokens ?? partial.output_tokens;
+            havePartial = true;
+          }
         }
         const final = await stream.finalMessage();
+        partial.input_tokens = final.usage.input_tokens;
+        partial.output_tokens = final.usage.output_tokens;
+        havePartial = true;
         opts.onComplete?.(final.usage);
-
-        // ─── 3) Post-stream: log + consume quota ─────────────────────────
-        // Even if validation could be added later, usage is real cost —
-        // always log and (when not BYOK) consume quota.
-        const usage = {
-          inputTokens: final.usage.input_tokens,
-          outputTokens: final.usage.output_tokens,
-        };
-        const costUsd = computeCost(candidateModel, usage);
-        if (userId) {
-          if (!bypassesQuota) {
-            await consumeQuota(userId, {
-              tokens: usage.inputTokens + usage.outputTokens,
-              costUsd,
-            });
+      } catch (err) {
+        streamError = err;
+      } finally {
+        // ─── 3) Post-stream: log + consume quota — ALWAYS try ───────────
+        // Even on error, real tokens may have been spent. Record what we
+        // know. Wrap in its own try so logging failures never propagate.
+        if (userId && havePartial) {
+          try {
+            const usage = {
+              inputTokens: partial.input_tokens,
+              outputTokens: partial.output_tokens,
+            };
+            const costUsd = computeCost(candidateModel, usage);
+            if (!bypassesQuota) {
+              await consumeQuota(userId, {
+                tokens: usage.inputTokens + usage.outputTokens,
+                costUsd,
+              });
+            }
+            await logUsage(
+              useCase,
+              {
+                content: '',
+                modelUsed: candidateModel,
+                provider: 'anthropic-direct',
+                totalCostUsd: costUsd,
+                usage,
+                attempts: [
+                  {
+                    model: candidateModel,
+                    provider: 'anthropic-direct',
+                    validationPassed: streamError === null,
+                    validationError: streamError
+                      ? streamError instanceof Error
+                        ? streamError.message
+                        : String(streamError)
+                      : undefined,
+                    usage,
+                    costUsd,
+                    durationMs: 0,
+                  },
+                ],
+              },
+              opts.traceTag ?? (streamError ? 'stream-error' : 'stream')
+            );
+          } catch (logErr) {
+            console.error('[ai/claude:claudeStream] post-stream logging failed:', logErr);
           }
-          await logUsage(
-            useCase,
-            {
-              content: '',
-              modelUsed: candidateModel,
-              provider: 'anthropic-direct',
-              totalCostUsd: costUsd,
-              usage,
-              attempts: [
-                {
-                  model: candidateModel,
-                  provider: 'anthropic-direct',
-                  validationPassed: true,
-                  usage,
-                  costUsd,
-                  durationMs: 0,
-                },
-              ],
-            },
-            opts.traceTag ?? 'stream'
-          );
         }
 
-        controller.close();
-      } catch (err) {
-        controller.error(err);
+        if (streamError) {
+          controller.error(streamError);
+        } else {
+          controller.close();
+        }
       }
     },
   });
