@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { claudeChat, isClaudeConfigured } from '@/lib/ai/claude';
+import { getOrCreateUserId } from '@/lib/auth/user';
 
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getOrCreateUserId();
     const { service, label, language, cloudProvider = 'aws' } = await request.json();
 
     if (!service || !language) {
@@ -16,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     try {
       if (isClaudeConfigured()) {
-        implementation = await generateWithClaude(service, language, cloudProvider);
+        implementation = await generateWithClaude(userId, service, language, cloudProvider);
       } else {
         implementation = generateMockImplementation(service, label, language, cloudProvider);
       }
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function generateWithClaude(service: string, language: string, cloudProvider: string) {
+async function generateWithClaude(userId: string, service: string, language: string, cloudProvider: string) {
   const prompt = `Generate realistic, accurate, and well-formatted ${language} code for implementing the ${service} service on ${cloudProvider.toUpperCase()}.
 
 The code should:
@@ -52,6 +54,8 @@ The code should:
 Output only the code, no explanations before or after, no markdown fences.`;
 
   const { content } = await claudeChat({
+    userId,
+    useCase: 'sdk-snippet',
     message: prompt,
     temperature: 0.3,
     maxTokens: 1024,
