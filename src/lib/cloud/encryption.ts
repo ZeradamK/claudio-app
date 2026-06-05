@@ -1,19 +1,24 @@
 /**
  * Symmetric-encryption helper for credentials at rest.
  *
- * Phase 6 stores cloud connections — including the AWS external id — in a
- * JSON file on disk. The external id is not nearly as sensitive as a real
- * access key (it's a shared secret that's only useful in combination with
- * the role's trust policy), but we encrypt it anyway so the on-disk format
- * is the same shape as the Phase 2 / Postgres path will need.
+ * Used by:
+ *   - data/cloud-connections.json  → encrypted externalId per connection
+ *   - data/user-profiles.json       → encrypted BYOK API keys per provider
  *
- * Algorithm: AES-256-GCM with a 96-bit nonce.
- * Key source: process.env.ENCRYPTION_KEY — 32 bytes, base64-encoded.
- * If unset (dev convenience), we derive a deterministic key from a fixed
- * dev string AND warn loudly. Production deploys MUST set ENCRYPTION_KEY.
+ * Algorithm: AES-256-GCM with a 96-bit nonce per encrypt.
+ * Key source: process.env.ENCRYPTION_KEY — 32 raw bytes, base64-encoded.
+ *
+ * SECURITY: hard-fails when ENCRYPTION_KEY is unset, in every NODE_ENV.
+ *
+ * Audit S7 / CWE-321 (Use of Hard-coded Cryptographic Key): the previous
+ * implementation derived a deterministic key from sha256("claudio-dev-fallback-key")
+ * when the env var was missing. Anyone reading the open-source repo could
+ * derive that key and decrypt any blob ever written without ENCRYPTION_KEY.
+ * The fallback is gone. Operators MUST set ENCRYPTION_KEY in every env;
+ * setup script in scripts/generate-encryption-key.sh prints a fresh one.
  */
 
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
+import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 
 const ALGO = 'aes-256-gcm' as const;
 const NONCE_BYTES = 12;
@@ -24,26 +29,25 @@ function getKey(): Buffer {
   if (cachedKey) return cachedKey;
 
   const envKey = process.env.ENCRYPTION_KEY?.trim();
-  if (envKey) {
-    const decoded = Buffer.from(envKey, 'base64');
-    if (decoded.length !== KEY_BYTES) {
-      throw new Error(
-        `ENCRYPTION_KEY must decode to ${KEY_BYTES} bytes (got ${decoded.length}). Generate one with: node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`
-      );
-    }
-    cachedKey = decoded;
-    return cachedKey;
+  if (!envKey) {
+    // Fail-closed (CWE-321). No dev fallback, no environment carve-out.
+    throw new Error(
+      'ENCRYPTION_KEY is required. Generate one with: ' +
+        'openssl rand -base64 32 ' +
+        '— then add ENCRYPTION_KEY=<value> to .env.local.'
+    );
   }
-
-  // Dev fallback — never in production.
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('ENCRYPTION_KEY is required in production.');
+  const decoded = Buffer.from(envKey, 'base64');
+  if (decoded.length !== KEY_BYTES) {
+    throw new Error(
+      'ENCRYPTION_KEY must decode to ' +
+        KEY_BYTES +
+        ' bytes (got ' +
+        decoded.length +
+        '). Generate a fresh one with: openssl rand -base64 32'
+    );
   }
-  // eslint-disable-next-line no-console
-  console.warn(
-    '[cloud/encryption] ENCRYPTION_KEY not set — using a derived dev key. Set ENCRYPTION_KEY in .env.local before going to prod.'
-  );
-  cachedKey = createHash('sha256').update('claudio-dev-fallback-key').digest();
+  cachedKey = decoded;
   return cachedKey;
 }
 
