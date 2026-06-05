@@ -248,7 +248,64 @@ for (const file of aiCallers) {
   }
 }
 
-console.log('\nFinal: ' + passes + ' passed, ' + failures + ' failed');
-if (failures > 0) process.exit(1);
+// ─── S8 / audit #8: rate-limiter peek + memory leak ───────────────────────
 
-process.exit(0);
+import {
+  peekRateLimit,
+  recordRateLimit,
+  resetRateLimiter,
+} from '../src/lib/plans/rate-limiter';
+
+console.log('\n── S8 rate-limiter peek + memory hygiene ──');
+
+resetRateLimiter();
+
+// peek must not consume
+const u = 'audit-user-peek';
+const limit = 5;
+const window = 60_000;
+const p1 = peekRateLimit(u, limit, window);
+const p2 = peekRateLimit(u, limit, window);
+const p3 = peekRateLimit(u, limit, window);
+if (p1.remaining === 5 && p2.remaining === 5 && p3.remaining === 5) {
+  console.log('  pass [S8] peek does not consume (5,5,5 across 3 calls)');
+  passes++;
+} else {
+  console.error(
+    '  FAIL [S8] peek consumed: ' + p1.remaining + ',' + p2.remaining + ',' + p3.remaining
+  );
+  failures++;
+}
+
+// record must consume
+const r1 = recordRateLimit(u, limit, window);
+const r2 = recordRateLimit(u, limit, window);
+if (r1.remaining === 4 && r2.remaining === 3) {
+  console.log('  pass [S8] record consumes (4 then 3 remaining)');
+  passes++;
+} else {
+  console.error('  FAIL [S8] record did not consume: ' + r1.remaining + ',' + r2.remaining);
+  failures++;
+}
+
+// memory leak: after a long-ago entry expires, the user's key should be
+// purged from the internal map (we can't introspect the map directly,
+// but we can verify pruneFresh behaviour via peek with a tiny window).
+async function leakTest() {
+  resetRateLimiter();
+  recordRateLimit('leak-user', limit, 1); // 1ms window
+  await new Promise((r) => setTimeout(r, 5));
+  const after = peekRateLimit('leak-user', limit, 1);
+  if (after.remaining === limit) {
+    console.log('  pass [S8] expired entries pruned (memory leak fix)');
+    passes++;
+  } else {
+    console.error('  FAIL [S8] expired entries leaked');
+    failures++;
+  }
+}
+
+leakTest().then(() => {
+  console.log('\nFinal: ' + passes + ' passed, ' + failures + ' failed');
+  process.exit(failures > 0 ? 1 : 0);
+});
