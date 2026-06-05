@@ -54,6 +54,7 @@ export class AnthropicAdapter implements ProviderAdapter {
   }
 
   async call(opts: ProviderCallOpts): Promise<ProviderCallResult> {
+    const apiKey = opts.apiKey || process.env.ANTHROPIC_API_KEY || '';
     const client = getClient(opts.apiKey);
     const model = normalizeModel(opts.model);
 
@@ -63,13 +64,21 @@ export class AnthropicAdapter implements ProviderAdapter {
     }
     messages.push({ role: 'user', content: opts.message });
 
-    const response = await client.messages.create({
-      model,
-      max_tokens: opts.maxTokens ?? 4096,
-      temperature: opts.temperature ?? 0.7,
-      system: buildSystemBlocks(opts.system, opts.cacheable),
-      messages,
-    });
+    let response;
+    try {
+      response = await client.messages.create({
+        model,
+        max_tokens: opts.maxTokens ?? 4096,
+        temperature: opts.temperature ?? 0.7,
+        system: buildSystemBlocks(opts.system, opts.cacheable),
+        messages,
+      });
+    } catch (err) {
+      // CWE-209: redact api key from error text + cap length.
+      const raw = err instanceof Error ? err.message : String(err);
+      const safe = (apiKey ? raw.replaceAll(apiKey, '<redacted>') : raw).slice(0, 256);
+      throw new Error('Anthropic ' + safe);
+    }
 
     const content = response.content
       .filter((b): b is Anthropic.TextBlock => b.type === 'text')
