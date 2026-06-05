@@ -88,12 +88,15 @@ export class OpenRouterAdapter implements ProviderAdapter {
 
     if (!resp.ok) {
       const text = await resp.text().catch(() => '');
-      throw new Error(`OpenRouter ${resp.status}: ${text || resp.statusText}`);
+      // CWE-209: redact api key + cap length before throw.
+      const safe = text.replaceAll(apiKey, '<redacted>').slice(0, 256);
+      throw new Error('OpenRouter ' + resp.status + ': ' + (safe || resp.statusText));
     }
 
     const data = (await resp.json()) as OpenRouterResponse;
     if (data.error) {
-      throw new Error(`OpenRouter API error: ${data.error.message}`);
+      const msg = data.error.message.replaceAll(apiKey, '<redacted>').slice(0, 256);
+      throw new Error('OpenRouter API error: ' + msg);
     }
 
     const content = data.choices[0]?.message?.content ?? '';
