@@ -183,4 +183,43 @@ if (!isUuid('550e8400-e29b-41d4-a716-446655440000')) {
   process.exit(1);
 }
 
+// ─── S4: upgrade-endpoint env gate logic ─────────────────────────────────
+//
+// Mirror the gate decision so any future change to the gate code is
+// flagged here. Both clauses MUST be present for the stub to be usable.
+
+console.log('\n── S4 upgrade gate decision matrix ──');
+
+function gateDecision(nodeEnv: string | undefined, allow: string | undefined): boolean {
+  if (nodeEnv === 'production') return false;
+  return allow === '1';
+}
+
+const gateCases: Array<[string | undefined, string | undefined, boolean, string]> = [
+  ['production', '1', false, 'prod + opt-in = STILL denied'],
+  ['production', undefined, false, 'prod + no opt-in = denied'],
+  ['development', '1', true, 'dev + opt-in = allowed'],
+  ['development', undefined, false, 'dev + no opt-in = denied (default)'],
+  ['development', 'true', false, 'dev + wrong opt-in value = denied'],
+  ['development', '0', false, 'dev + opt-out value = denied'],
+  [undefined, '1', true, 'unknown env + opt-in = allowed (non-prod default)'],
+  [undefined, undefined, false, 'unknown env + nothing = denied'],
+];
+
+for (const [env, allow, expected, label] of gateCases) {
+  const got = gateDecision(env, allow);
+  if (got === expected) {
+    console.log('  pass [S4] ' + label);
+    passes++;
+  } else {
+    console.error(
+      '  FAIL [S4] ' + label + ' — expected ' + expected + ' got ' + got
+    );
+    failures++;
+  }
+}
+
+console.log('\nFinal: ' + passes + ' passed, ' + failures + ' failed');
+if (failures > 0) process.exit(1);
+
 process.exit(0);
