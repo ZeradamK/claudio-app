@@ -28,7 +28,7 @@ import { computeCost } from './pricing';
 import { getRouteConfig } from './routing';
 import { logUsage } from './cost-tracker';
 import { validate } from './validators';
-import { gateForAttempt } from '../plans/gate';
+import { consumeRateSlot, peekForAttempt } from '../plans/gate';
 import { consumeQuota } from '../plans/quota-tracker';
 import type {
   AIRequest,
@@ -121,9 +121,12 @@ export async function runAI(req: AIRequest): Promise<AIResponse> {
 
   for (const next of attemptList) {
     // Step 1: Run the gate (only when we have a userId — internal calls bypass).
+    // Uses PEEK (no rate-slot consumed); we record one slot below before the
+    // actual upstream call, so a request that tries primary → fallback1 →
+    // fallback2 burns at most ONE rate slot total (S8 fix).
     let gateDecision: GateDecision;
     if (req.userId) {
-      gateDecision = await gateForAttempt({
+      gateDecision = await peekForAttempt({
         userId: req.userId,
         useCase: req.useCase,
         candidateModel: next.model,
@@ -191,6 +194,13 @@ export async function runAI(req: AIRequest): Promise<AIResponse> {
     };
 
     try {
+      // S8: now that we've picked an adapter we're actually going to call,
+      // commit one rate-limit slot. BYOK calls do not count against rate
+      // limits (bypassesQuota implies bypassesRate too).
+      if (req.userId && !gateDecision.bypassesQuota) {
+        await consumeRateSlot(req.userId);
+      }
+
       const callOpts: ProviderCallOpts = {
         model: next.model,
         system: req.system,
