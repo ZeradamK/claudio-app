@@ -12,6 +12,11 @@ export interface StreamingOptions {
   temperature?: number;
   maxTokens?: number;
   chatHistory?: Array<{ role: string; message: string }>;
+  /**
+   * Authenticated caller id (S5 / CWE-862). Forwarded to claudeStream so
+   * the plan gate applies once streaming is wired through the router (S6).
+   */
+  userId?: string;
 }
 
 export async function streamingCohereChatCompletion(
@@ -23,6 +28,7 @@ export async function streamingCohereChatCompletion(
     temperature = 0.7,
     maxTokens = 1024,
     chatHistory = [],
+    userId,
   } = options;
 
   const history = chatHistory.map((m) => ({
@@ -34,6 +40,7 @@ export async function streamingCohereChatCompletion(
   }));
 
   return claudeStream({
+    userId,
     message,
     system: promptContext || undefined,
     temperature,

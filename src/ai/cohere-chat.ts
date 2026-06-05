@@ -13,6 +13,12 @@ export interface CohereChatOptions {
   temperature?: number;
   maxTokens?: number;
   chatHistory?: ChatMessage[];
+  /**
+   * Authenticated caller id (S5 / CWE-862). Forwarded to claudeChat so
+   * the plan gate applies. Callers MUST pass this; the router will warn
+   * (non-prod) or refuse (prod) when missing.
+   */
+  userId?: string;
 }
 
 export async function generateCohereChatCompletion({
@@ -21,6 +27,7 @@ export async function generateCohereChatCompletion({
   temperature = 0.7,
   maxTokens = 1000,
   chatHistory = [],
+  userId,
 }: CohereChatOptions): Promise<string> {
   try {
     const history = chatHistory.map((m) => ({
@@ -29,6 +36,7 @@ export async function generateCohereChatCompletion({
     }));
 
     const { content } = await claudeChat({
+      userId,
       message,
       system: promptContext || undefined,
       temperature,
