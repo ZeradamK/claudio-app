@@ -147,7 +147,31 @@ export async function runAI(req: AIRequest): Promise<AIResponse> {
         continue;
       }
     } else {
-      // Internal call — synthesize an "allow-server" decision.
+      // No userId on the request. This is the legacy "internal call" path
+      // that synthesizes an allow-server decision and bypasses the plan
+      // gate. It is dangerous (audit S5 / CWE-862: missing authorization)
+      // because it gives free unmetered flagship-model access whenever
+      // a caller forgets to plumb userId through.
+      //
+      // Production refuses outright; non-prod logs loudly so the missing
+      // wiring surfaces in dev logs. Internal background jobs that
+      // genuinely need to bypass the gate must set userId to a
+      // service-account marker AND set ALLOW_INTERNAL_BYPASS=1.
+      const allowInternal = process.env.ALLOW_INTERNAL_BYPASS === '1';
+      if (process.env.NODE_ENV === 'production' && !allowInternal) {
+        throw new AIRouterError(
+          'AI request rejected: userId is required in production. Set ' +
+            'ALLOW_INTERNAL_BYPASS=1 for service-account callers.',
+          attempts,
+          'userId required'
+        );
+      }
+      console.warn(
+        '[ai/router] WARN: AI request without userId — plan gate bypassed. ' +
+          'useCase=' + req.useCase +
+          ', model=' + next.model +
+          '. This is a CWE-862 vector and must be fixed before production.'
+      );
       gateDecision = {
         kind: 'allow-server',
         resolvedModel: next.model,
