@@ -4,9 +4,11 @@ import { detectArchitectureIntent } from '@/ai/intent/architectureIntents';
 import { generateCohereChatCompletion } from '@/ai/cohere-chat';
 import { processArchitectureWithIcons } from '@/ai/middleware/architectureIconProcessor';
 import { getArchitecture, saveArchitecture } from '@/store/architecture-store';
+import { getOrCreateUserId } from '@/lib/auth/user';
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = await getOrCreateUserId();
     const { message, architectureId, cloudProvider = 'aws' } = await req.json();
 
     if (!message) {
@@ -15,13 +17,13 @@ export async function POST(req: NextRequest) {
 
     // Detect if this is an architecture modification request
     const intentResult = await detectArchitectureIntent(message);
-    
+
     if (intentResult && architectureId) {
       // Handle architecture modification
-      return await handleArchitectureModification(message, architectureId, cloudProvider, intentResult);
+      return await handleArchitectureModification(userId, message, architectureId, cloudProvider, intentResult);
     } else {
       // Handle regular chat
-      return await handleRegularChat(message, cloudProvider, architectureId);
+      return await handleRegularChat(userId, message, cloudProvider, architectureId);
     }
   } catch (error) {
     console.error('Error in Jarvis chat:', error);
@@ -33,6 +35,7 @@ export async function POST(req: NextRequest) {
 }
 
 async function handleArchitectureModification(
+  userId: string,
   message: string,
   architectureId: string,
   cloudProvider: string,
@@ -106,9 +109,9 @@ Return ONLY valid JSON in this exact format:
   }
 }`;
 
-    // Generate updated architecture using Cohere Command A
+    // Generate updated architecture (Claude-backed via shim)
     const response = await generateCohereChatCompletion({
-      model: 'command-a-03-2025',
+      userId,
       message: modificationPrompt,
       temperature: 0.3,
       maxTokens: 4000
@@ -169,7 +172,7 @@ Return ONLY valid JSON in this exact format:
   }
 }
 
-async function handleRegularChat(message: string, cloudProvider: string, architectureId?: string) {
+async function handleRegularChat(userId: string, message: string, cloudProvider: string, architectureId?: string) {
   // Get current architecture context if available
   let architectureContext = '';
   if (architectureId) {
@@ -240,12 +243,12 @@ INSTRUCTIONS:
 
 Keep responses informative and helpful.`;
 
-  // Stream the response using Cohere Command A
+  // Stream the response (Claude-backed via shim)
   return streamingCohereChatCompletion({
-    model: 'command-a-03-2025',
+    userId,
     message: message,
     promptContext: chatPrompt,
     temperature: 0.7,
     maxTokens: 1024
   });
-} 
+}
