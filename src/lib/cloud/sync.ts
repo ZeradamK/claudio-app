@@ -1,7 +1,8 @@
 /**
  * Sync orchestrator. The `/api/cloud/connections/[id]/sync` route delegates
- * here. Decides whether to call the real AWS SDK or return mock inventory,
- * persists the result, and updates connection status.
+ * here after performing the ownership check via `getConnection(id, userId)`.
+ * The owner's userId is plumbed through so the post-sync status updates also
+ * go through the ownership-checked store API (CWE-639 defense in depth).
  */
 
 import { assumeRole } from './aws/client';
@@ -10,12 +11,22 @@ import { runInventoryScan } from './aws/scanners';
 import { saveInventory, updateConnection } from './store';
 import type { CloudConnection, CloudInventory } from './types';
 
-export async function syncConnection(conn: CloudConnection): Promise<CloudInventory> {
+export async function syncConnection(
+  conn: CloudConnection,
+  callerUserId: string
+): Promise<CloudInventory> {
+  // Trust-but-verify: the caller is responsible for proving ownership via
+  // getConnection() before calling us. We re-assert here so a future caller
+  // that forgets cannot accidentally widen the blast radius.
+  if (conn.userId !== callerUserId) {
+    throw new Error('syncConnection: caller does not own this connection');
+  }
+
   // ─── Mock mode: short-circuit ───────────────────────────────────────────
   if (conn.mode === 'mock') {
     const inv = buildMockInventory(conn.id);
     await saveInventory(inv);
-    await updateConnection(conn.id, {
+    await updateConnection(conn.id, callerUserId, {
       status: 'connected',
       lastSyncedAt: inv.syncedAt,
       lastErrorMessage: undefined,
@@ -28,7 +39,9 @@ export async function syncConnection(conn: CloudConnection): Promise<CloudInvent
 
   // ─── Live mode: real AWS ────────────────────────────────────────────────
   if (conn.provider !== 'aws' || !conn.aws) {
-    throw new Error(`Live mode requires an AWS connection; ${conn.id} has ${conn.provider}`);
+    throw new Error(
+      'Live mode requires an AWS connection; ' + conn.id + ' has ' + conn.provider
+    );
   }
   const { regions } = conn.aws;
 
@@ -36,7 +49,7 @@ export async function syncConnection(conn: CloudConnection): Promise<CloudInvent
     const creds = await assumeRole(conn);
     const inv = await runInventoryScan(conn.id, regions, creds);
     await saveInventory(inv);
-    await updateConnection(conn.id, {
+    await updateConnection(conn.id, callerUserId, {
       status: 'connected',
       lastSyncedAt: inv.syncedAt,
       lastErrorMessage: undefined,
@@ -48,7 +61,7 @@ export async function syncConnection(conn: CloudConnection): Promise<CloudInvent
     const status = /AccessDenied|not authorized|AccessKey|signature/i.test(message)
       ? 'unauthorized'
       : 'error';
-    await updateConnection(conn.id, {
+    await updateConnection(conn.id, callerUserId, {
       status,
       lastErrorMessage: message,
     });
