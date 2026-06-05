@@ -160,16 +160,86 @@ export async function claudeJson<T = unknown>(
 
 // ─── Streaming (Anthropic-direct for now; Phase 7 routes via OpenRouter) ──
 
+import { gateForAttempt } from '../plans/gate';
+import { consumeQuota } from '../plans/quota-tracker';
+import { logUsage } from './cost-tracker';
+import { computeCost } from './pricing';
+
 export interface ClaudeStreamOptions extends ClaudeRequestBase {
   onDelta?: (chunk: string) => void;
   onComplete?: (usage: Anthropic.Messages.Usage) => void;
 }
 
+/**
+ * Plan-gated streaming chat (S6 fix). Pre-stream the request goes through
+ * the same `gateForAttempt` the non-streaming router uses, so:
+ *   - the use-case is checked against the plan
+ *   - rate limit and daily quota are consulted (and consumed post-stream
+ *     for server-funded calls)
+ *   - BYOK keys are honoured (skipping server quota)
+ *
+ * Before this commit, streaming was Anthropic-direct with zero gating —
+ * every chat-UI call hit ANTHROPIC_API_KEY unmetered, the highest-volume
+ * use case in the app (audit S6 / CWE-862).
+ */
 export async function claudeStream(opts: ClaudeStreamOptions): Promise<Response> {
-  const apiKey = opts.apiKey || process.env.ANTHROPIC_API_KEY;
+  // ─── 1) Plan gate ──────────────────────────────────────────────────────
+  // Production refuses streaming without userId (matches router behaviour).
+  if (!opts.userId) {
+    const allowInternal = process.env.ALLOW_INTERNAL_BYPASS === '1';
+    if (process.env.NODE_ENV === 'production' && !allowInternal) {
+      return new Response(
+        JSON.stringify({ error: 'userId required for streaming in production' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    console.warn(
+      '[ai/claude:claudeStream] WARN: stream request without userId — plan gate bypassed.'
+    );
+  }
+
+  const candidateModel = opts.model ?? getBestClaudeModel('general');
+  let decision: Awaited<ReturnType<typeof gateForAttempt>> | null = null;
+
+  if (opts.userId) {
+    decision = await gateForAttempt({
+      userId: opts.userId,
+      useCase: opts.useCase ?? 'chat-modification',
+      candidateModel,
+    });
+    if (decision.kind !== 'allow-server' && decision.kind !== 'allow-byok') {
+      // Gate refused — return a JSON 403/429 so the UI can show an upgrade
+      // modal or retry, instead of starting a stream that fails mid-way.
+      const status =
+        decision.kind === 'deny-rate-limit'
+          ? 429
+          : decision.kind === 'deny-quota-exhausted'
+            ? 429
+            : 403;
+      return new Response(
+        JSON.stringify({
+          error: 'message' in decision ? decision.message : 'AI call denied',
+          reason: decision.kind,
+        }),
+        { status, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+  }
+
+  // ─── 2) Pick API key ───────────────────────────────────────────────────
+  // BYOK gate decision provides the user's key; otherwise server key.
+  const apiKey =
+    (decision && decision.kind === 'allow-byok' && 'apiKey' in decision
+      ? decision.apiKey
+      : undefined) ||
+    opts.apiKey ||
+    process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return new Response(
-      JSON.stringify({ error: 'ANTHROPIC_API_KEY is required for streaming (multi-provider streaming lands Phase 7).' }),
+      JSON.stringify({
+        error:
+          'No API key available. Set ANTHROPIC_API_KEY or add a BYOK key via /settings/api-keys.',
+      }),
       { status: 401, headers: { 'Content-Type': 'application/json' } }
     );
   }
@@ -192,11 +262,15 @@ export async function claudeStream(opts: ClaudeStreamOptions): Promise<Response>
         : opts.system;
 
   const encoder = new TextEncoder();
+  const userId = opts.userId;
+  const useCase = opts.useCase ?? 'chat-modification';
+  const bypassesQuota = decision?.bypassesQuota === true;
+
   const readable = new ReadableStream({
     async start(controller) {
       try {
         const stream = client.messages.stream({
-          model: opts.model ?? getBestClaudeModel('general'),
+          model: candidateModel,
           max_tokens: opts.maxTokens ?? 4096,
           temperature: opts.temperature ?? 0.7,
           system,
@@ -211,6 +285,45 @@ export async function claudeStream(opts: ClaudeStreamOptions): Promise<Response>
         }
         const final = await stream.finalMessage();
         opts.onComplete?.(final.usage);
+
+        // ─── 3) Post-stream: log + consume quota ─────────────────────────
+        // Even if validation could be added later, usage is real cost —
+        // always log and (when not BYOK) consume quota.
+        const usage = {
+          inputTokens: final.usage.input_tokens,
+          outputTokens: final.usage.output_tokens,
+        };
+        const costUsd = computeCost(candidateModel, usage);
+        if (userId) {
+          if (!bypassesQuota) {
+            await consumeQuota(userId, {
+              tokens: usage.inputTokens + usage.outputTokens,
+              costUsd,
+            });
+          }
+          await logUsage(
+            useCase,
+            {
+              content: '',
+              modelUsed: candidateModel,
+              provider: 'anthropic-direct',
+              totalCostUsd: costUsd,
+              usage,
+              attempts: [
+                {
+                  model: candidateModel,
+                  provider: 'anthropic-direct',
+                  validationPassed: true,
+                  usage,
+                  costUsd,
+                  durationMs: 0,
+                },
+              ],
+            },
+            opts.traceTag ?? 'stream'
+          );
+        }
+
         controller.close();
       } catch (err) {
         controller.error(err);
