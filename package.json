@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "audit:security": "tsx scripts/audit-cloud-validators.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
