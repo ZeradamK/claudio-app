@@ -39,6 +39,10 @@ export async function getOrCreateUserId(): Promise<string> {
     jar.set(COOKIE_NAME, fresh, {
       httpOnly: true,
       sameSite: 'lax',
+      // Secure in production: cookie only sent over HTTPS, blocks MITM
+      // sniffing on shared networks. Off in dev where localhost is HTTP.
+      // (H1 partial mitigation — full fix is real auth in Phase 2.)
+      secure: process.env.NODE_ENV === 'production',
       maxAge: COOKIE_MAX_AGE,
       path: '/',
     });
