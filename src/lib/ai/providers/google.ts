@@ -83,20 +83,28 @@ export class GoogleGeminiAdapter implements ProviderAdapter {
       body.systemInstruction = { role: 'system', parts: [{ text: systemText }] };
     }
 
-    const url = `${GEMINI_BASE}/${model}:generateContent?key=${encodeURIComponent(opts.apiKey)}`;
+    // CWE-598 (sensitive info in URL query string): Gemini supports the
+    // x-goog-api-key header as an alternative to ?key=. Headers do not
+    // appear in proxy/CDN access logs the way URL query strings do.
+    const url = GEMINI_BASE + '/' + model + ':generateContent';
     const resp = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': opts.apiKey,
+      },
       body: JSON.stringify(body),
     });
 
     if (!resp.ok) {
       const text = await resp.text().catch(() => '');
-      throw new Error(`Gemini ${resp.status}: ${text || resp.statusText}`);
+      // Strip any echo of the api key from error text just in case.
+      const safeText = text.replaceAll(opts.apiKey, '<redacted>');
+      throw new Error('Gemini ' + resp.status + ': ' + (safeText || resp.statusText));
     }
 
     const data = (await resp.json()) as GeminiResponse;
-    if (data.error) throw new Error(`Gemini API error: ${data.error.message}`);
+    if (data.error) throw new Error('Gemini API error: ' + data.error.message);
 
     const content =
       data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '';
