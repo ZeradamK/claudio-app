@@ -1,0 +1,186 @@
+/**
+ * Adversarial test harness for S1/S2/S3 hardening.
+ *
+ * Runs a battery of malicious inputs against the cloud validators and the
+ * CloudFormation generator. Exits non-zero if any payload bypasses the
+ * defense. Run with: `pnpm tsx scripts/audit-cloud-validators.ts`.
+ *
+ * Maps each test to its CWE so a future engineer can map regressions
+ * back to the original threat.
+ */
+
+import {
+  InvalidInputError,
+  isUuid,
+  requireAwsExternalId,
+  requireAwsRoleArn,
+  requireAwsRegions,
+  requireSafeName,
+  requireUuid,
+} from '../src/lib/cloud/validators';
+import { pickPatchableConnectionFields } from '../src/lib/cloud/patch';
+import {
+  generateCloudFormationYaml,
+} from '../src/lib/cloud/aws/cloudformation';
+
+let failures = 0;
+let passes = 0;
+
+function expectReject(label: string, cwe: string, fn: () => unknown) {
+  try {
+    fn();
+    failures++;
+    console.error('  FAIL [' + cwe + '] ' + label + ' — payload was accepted');
+  } catch (err) {
+    if (err instanceof InvalidInputError || (err as Error).message) {
+      passes++;
+      console.log('  pass [' + cwe + '] ' + label);
+    } else {
+      failures++;
+      console.error('  FAIL [' + cwe + '] ' + label + ' — wrong error class');
+    }
+  }
+}
+
+function expectAccept(label: string, fn: () => unknown) {
+  try {
+    fn();
+    passes++;
+    console.log('  pass (positive) ' + label);
+  } catch (err) {
+    failures++;
+    console.error('  FAIL (positive) ' + label + ' — ' + (err as Error).message);
+  }
+}
+
+console.log('\n── CWE-22 path traversal via UUID parameter ──');
+expectReject('dot-dot-slash', 'CWE-22', () => requireUuid('id', '../../etc/passwd'));
+expectReject('null-byte injection', 'CWE-22', () => requireUuid('id', '00000000-0000-4000-8000-000000000000\x00'));
+expectReject('UUID with trailing newline', 'CWE-22', () =>
+  requireUuid('id', '00000000-0000-4000-8000-000000000000\n')
+);
+expectReject('non-v4 UUID (v1)', 'CWE-22', () => requireUuid('id', '00000000-0000-1000-8000-000000000000'));
+expectAccept('canonical v4 UUID', () => requireUuid('id', '550e8400-e29b-41d4-a716-446655440000'));
+
+console.log('\n── CWE-1336 YAML injection via externalId ──');
+expectReject('newline + extra resource', 'CWE-1336', () =>
+  requireAwsExternalId('externalId', "abcd1234abcd1234'\nExtra: !!python/object/apply")
+);
+expectReject('YAML colon break', 'CWE-1336', () =>
+  requireAwsExternalId('externalId', 'abcd:1234:abcd:1234')
+);
+expectReject('YAML anchor', 'CWE-1336', () =>
+  requireAwsExternalId('externalId', '&anchor1234567890')
+);
+expectReject('YAML directive', 'CWE-1336', () =>
+  requireAwsExternalId('externalId', '%YAML1234567890')
+);
+expectReject('whitespace', 'CWE-1336', () =>
+  requireAwsExternalId('externalId', 'has spaces 1234')
+);
+expectReject('too short', 'CWE-1336', () => requireAwsExternalId('externalId', 'short'));
+expectReject('too long', 'CWE-1336', () => requireAwsExternalId('externalId', 'a'.repeat(129)));
+expectAccept('valid 32-hex', () =>
+  requireAwsExternalId('externalId', 'a1b2c3d4e5f60718293a4b5c6d7e8f90')
+);
+
+console.log('\n── End-to-end YAML render must reject injection payloads ──');
+expectReject('YAML render with newline in externalId', 'CWE-1336', () =>
+  generateCloudFormationYaml({
+    externalId: "abc'\nMaliciousRole: AWS::IAM::Role".padEnd(20, 'x'),
+  })
+);
+expectReject('YAML render with bad claudio account', 'CWE-1336', () =>
+  generateCloudFormationYaml({
+    externalId: 'a1b2c3d4e5f60718293a4b5c6d7e8f90',
+    claudioAwsAccountId: "123456789012'\nMaliciousRole: foo",
+  })
+);
+expectAccept('YAML render with valid inputs', () => {
+  const yaml = generateCloudFormationYaml({
+    externalId: 'a1b2c3d4e5f60718293a4b5c6d7e8f90',
+    claudioAwsAccountId: '123456789012',
+  });
+  if (!yaml.includes("sts:ExternalId: 'a1b2c3d4e5f60718293a4b5c6d7e8f90'")) {
+    throw new Error('externalId not quoted in output');
+  }
+  if (!yaml.includes("AWS: 'arn:aws:iam::123456789012:root'")) {
+    throw new Error('account ARN not quoted in output');
+  }
+});
+
+console.log('\n── CWE-915 mass assignment via PATCH body ──');
+expectReject('PATCH userId', 'CWE-915', () =>
+  pickPatchableConnectionFields({ userId: 'victim-uuid' })
+);
+expectReject('PATCH id', 'CWE-915', () => pickPatchableConnectionFields({ id: 'spoof' }));
+expectReject('PATCH status', 'CWE-915', () =>
+  pickPatchableConnectionFields({ status: 'connected' })
+);
+expectReject('PATCH mode', 'CWE-915', () => pickPatchableConnectionFields({ mode: 'live' }));
+expectReject('PATCH provider', 'CWE-915', () =>
+  pickPatchableConnectionFields({ provider: 'aws' })
+);
+expectReject('PATCH lastInventory', 'CWE-915', () =>
+  pickPatchableConnectionFields({ lastInventory: { fake: true } })
+);
+expectReject('PATCH aws.roleArn', 'CWE-915', () =>
+  pickPatchableConnectionFields({ aws: { roleArn: 'arn:aws:iam::999999999999:role/evil' } })
+);
+expectReject('PATCH aws.externalId', 'CWE-915', () =>
+  pickPatchableConnectionFields({ aws: { externalId: 'attacker-controlled' } })
+);
+expectReject('PATCH aws.accountId', 'CWE-915', () =>
+  pickPatchableConnectionFields({ aws: { accountId: '999999999999' } })
+);
+expectAccept('PATCH name (allowed)', () =>
+  pickPatchableConnectionFields({ name: 'My renamed connection' })
+);
+expectAccept('PATCH aws.regions (allowed)', () =>
+  pickPatchableConnectionFields({ aws: { regions: ['us-east-1', 'eu-west-1'] } })
+);
+
+console.log('\n── Role ARN format ──');
+expectReject('bad partition', 'CWE-20', () =>
+  requireAwsRoleArn('roleArn', 'arn:foo:iam::123456789012:role/x')
+);
+expectReject('bad account id (non-numeric)', 'CWE-20', () =>
+  requireAwsRoleArn('roleArn', 'arn:aws:iam::EVIL12345678:role/x')
+);
+expectReject('empty role name', 'CWE-20', () =>
+  requireAwsRoleArn('roleArn', 'arn:aws:iam::123456789012:role/')
+);
+expectAccept('valid role ARN', () =>
+  requireAwsRoleArn('roleArn', 'arn:aws:iam::123456789012:role/ClaudioReadOnlyRole')
+);
+
+console.log('\n── Region whitelist ──');
+expectReject('SQL fragment region', 'CWE-89', () =>
+  requireAwsRegions('regions', ["us-east-1' OR 1=1--"])
+);
+expectReject('unknown region', 'CWE-20', () => requireAwsRegions('regions', ['mars-1']));
+expectAccept('valid regions', () => requireAwsRegions('regions', ['us-east-1', 'eu-west-3']));
+
+console.log('\n── Name sanitization ──');
+expectReject('XSS in name', 'CWE-79', () =>
+  requireSafeName('name', '<script>alert(1)</script>')
+);
+expectReject('control char', 'CWE-176', () => requireSafeName('name', "evil\x00name"));
+expectReject('backtick', 'CWE-79', () => requireSafeName('name', 'evil`name'));
+expectAccept('safe name', () => requireSafeName('name', "My team's prod cluster (us-east-1)"));
+
+console.log(
+  '\n──────────\n' + passes + ' passed, ' + failures + ' failed'
+);
+
+if (failures > 0) {
+  process.exit(1);
+}
+
+// Sanity check on isUuid in addition to throw-based wrapper
+if (!isUuid('550e8400-e29b-41d4-a716-446655440000')) {
+  console.error('isUuid regression');
+  process.exit(1);
+}
+
+process.exit(0);
