@@ -230,7 +230,7 @@ import { execSync } from 'node:child_process';
 console.log('\n── S5 legacy AI route userId coverage ──');
 
 const aiCallers = execSync(
-  "grep -rln 'claudeChat\\|claudeJson\\|generateCohereChatCompletion\\|streamingCohereChatCompletion' src/app/api/ 2>/dev/null || true",
+  "grep -rln 'claudeChat\\|claudeJson\\|generateCohereChatCompletion\\|streamingCohereChatCompletion\\|cohereClient' src/app/api/ 2>/dev/null || true",
   { encoding: 'utf8' }
 )
   .trim()
