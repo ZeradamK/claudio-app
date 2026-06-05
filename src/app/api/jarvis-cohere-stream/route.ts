@@ -6,6 +6,7 @@ import { detectLanguage } from '@/utils/language-detection';
 import { Architecture, getArchitecture } from '@/store/architecture-store';
 import { getOrCreateSession, updateSession } from '@/ai/jarvis-orchestrator';
 import { getContextLevelForIntent, generateContextString } from '@/ai/context/contextManager';
+import { getOrCreateUserId } from '@/lib/auth/user';
 
 export const maxDuration = 60; // Set max duration to 60 seconds
 
@@ -23,13 +24,14 @@ interface ChatHistoryItem {
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Validate Cohere API key
+    // 1. Validate AI provider configured + derive caller identity
     if (!isCohereConfigured()) {
       return NextResponse.json(
-        { error: 'Cohere API key is not configured' },
+        { error: 'AI provider is not configured' },
         { status: 500 }
       );
     }
+    const userId = await getOrCreateUserId();
 
     // 2. Parse request
     const requestData: StreamRequest = await req.json();
@@ -112,9 +114,9 @@ YOUR TASK:
       ]
     });
     
-    // Layer 6: Generate Streaming Response with Cohere
+    // Layer 6: Generate Streaming Response (Claude-backed via shim)
     const streamResponse = await streamingCohereChatCompletion({
-      model: process.env.COHERE_MODEL || 'command-r-plus',
+      userId,
       message,
       promptContext: systemPrompt,
       temperature: 0.7,

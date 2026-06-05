@@ -7,6 +7,7 @@ import { Architecture, getArchitecture, saveArchitecture } from '@/store/archite
 import { getOrCreateSession, updateSession } from '@/ai/jarvis-orchestrator';
 import { getContextLevelForIntent, generateContextString } from '@/ai/context/contextManager';
 import { processArchitectureUpdate } from '@/ai/jarvis-integration';
+import { getOrCreateUserId } from '@/lib/auth/user';
 
 export const maxDuration = 60; // Set max duration to 60 seconds
 
@@ -25,13 +26,14 @@ interface ChatHistoryItem {
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Check if Cohere API key is configured
+    // 1. Check if AI provider is configured + derive caller identity
     if (!isCohereConfigured()) {
       return NextResponse.json(
-        { error: 'Cohere API key is not configured. Please add it to your .env.local file.' },
+        { error: 'AI provider is not configured. Please add ANTHROPIC_API_KEY to your .env.local file.' },
         { status: 500 }
       );
     }
+    const userId = await getOrCreateUserId();
 
     // 2. Parse the request
     const requestData: ChatRequest = await req.json();
@@ -178,7 +180,7 @@ You can help users with:
     if (isArchitectureUpdate) {
       // Use non-streaming for architecture updates to process the complete response
       const cohereResponse = await streamingCohereChatCompletion({
-        model: process.env.COHERE_MODEL || 'command-r-plus',
+        userId,
         message,
         promptContext: systemPrompt,
         temperature: 0.7,
@@ -337,7 +339,7 @@ You can help users with:
     
     // For non-architecture updates, use streaming response
     const streamResponse = await streamingCohereChatCompletion({
-      model: process.env.COHERE_MODEL || 'command-r-plus',
+      userId,
       message,
       promptContext: systemPrompt,
       temperature: 0.7,
