@@ -232,15 +232,21 @@ export async function updateConnection(
     if (idx === -1) return;
     const current = unsealConnection(disk[idx]);
     if (current.userId !== userId) return;
-    // userId, id, createdAt are immutable. AWS sub-object merge preserves
-    // any caller-controlled write of roleArn/externalId — those are
-    // separately guarded by pickPatchableConnectionFields() at the route.
+    // Defense in depth: never let id/createdAt/userId be overwritten even
+    // if a future caller forgets the route-level whitelist. AWS sub-object
+    // is merged shallowly so callers can update regions without re-sending
+    // roleArn/externalId; the route-level pickPatchableConnectionFields()
+    // is the trust boundary for what fields a HTTP client may touch.
+    const mergedAws = patch.aws
+      ? { ...current.aws, ...patch.aws } as NonNullable<CloudConnection['aws']>
+      : current.aws;
     const merged: CloudConnection = {
       ...current,
       ...patch,
       id,
       createdAt: current.createdAt,
       userId: current.userId,
+      aws: mergedAws,
     };
     disk[idx] = sealConnection(merged);
     await atomicWriteJson(CONNECTIONS_FILE, disk);
