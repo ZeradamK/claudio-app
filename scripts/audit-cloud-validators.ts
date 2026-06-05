@@ -305,7 +305,36 @@ async function leakTest() {
   }
 }
 
-leakTest().then(() => {
+// ─── S7: encryption fail-closed ──────────────────────────────────────────
+//
+// Spawn a child process with ENCRYPTION_KEY unset and verify any attempt
+// to use the encryption module throws. Avoids polluting THIS process's
+// env (which already has a real ENCRYPTION_KEY set in .env.local).
+
+async function s7FailClosedTest() {
+  console.log('\n── S7 encryption fail-closed ──');
+  const { spawnSync } = await import('node:child_process');
+  const childCode = [
+    "process.env.ENCRYPTION_KEY = '';",
+    "import('./src/lib/cloud/encryption.ts')",
+    "  .then(m => { try { m.encrypt('x'); console.log('LEAK'); process.exit(1); }",
+    "               catch (e) { console.log('FAILED_CLOSED:' + e.message.slice(0,60)); process.exit(0); } });",
+  ].join('\n');
+  const result = spawnSync('pnpm', ['exec', 'tsx', '-e', childCode], {
+    encoding: 'utf8',
+    env: { ...process.env, ENCRYPTION_KEY: '' },
+    cwd: process.cwd(),
+  });
+  if (result.stdout.includes('FAILED_CLOSED:')) {
+    console.log('  pass [S7] encryption refuses to run without ENCRYPTION_KEY');
+    passes++;
+  } else {
+    console.error('  FAIL [S7] encryption did NOT fail-close. stdout=' + result.stdout);
+    failures++;
+  }
+}
+
+leakTest().then(s7FailClosedTest).then(() => {
   console.log('\nFinal: ' + passes + ' passed, ' + failures + ' failed');
   process.exit(failures > 0 ? 1 : 0);
 });
